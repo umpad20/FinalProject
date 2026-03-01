@@ -34,6 +34,7 @@ const adminNav = [
     { name: 'Customers', href: '/admin/customers', icon: Users },
     { name: 'Deliveries', href: '/admin/deliveries', icon: Truck },
     { name: 'Reports', href: '/admin/reports', icon: FileText },
+    { name: 'Users', href: '/admin/users', icon: Users },
     { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];
 
