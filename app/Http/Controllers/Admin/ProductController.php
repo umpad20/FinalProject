@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -70,8 +71,8 @@ class ProductController extends Controller
             'variants.*.color_hex' => 'required|string|max:7',
             'variants.*.stock' => 'required|integer|min:0',
             'variants.*.sku' => 'required|string|unique:product_variants,sku',
-            'image_urls' => 'nullable|array',
-            'image_urls.*' => 'url',
+            'images' => 'nullable|array',
+            'images.*' => 'image|max:2048',
         ]);
 
         $product = Product::create([
@@ -96,11 +97,12 @@ class ProductController extends Controller
             ]);
         }
 
-        if ($request->image_urls) {
-            foreach ($request->image_urls as $i => $url) {
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $i => $file) {
+                $path = $file->store('products', 'public');
                 ProductImage::create([
                     'product_id' => $product->id,
-                    'url' => $url,
+                    'url' => '/storage/' . $path,
                     'alt' => $product->name,
                     'sort_order' => $i,
                 ]);
@@ -170,8 +172,53 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        // Delete uploaded images from storage
+        foreach ($product->images as $image) {
+            if (str_starts_with($image->url, '/storage/')) {
+                Storage::disk('public')->delete(str_replace('/storage/', '', $image->url));
+            }
+        }
+
         $product->delete();
         return redirect()->route('admin.products.index')
             ->with('success', 'Product deleted successfully!');
+    }
+
+    public function uploadImages(Request $request, Product $product)
+    {
+        $request->validate([
+            'images' => 'required|array|min:1',
+            'images.*' => 'image|max:2048',
+        ]);
+
+        $lastSort = $product->images()->max('sort_order') ?? -1;
+
+        foreach ($request->file('images') as $file) {
+            $lastSort++;
+            $path = $file->store('products', 'public');
+            ProductImage::create([
+                'product_id' => $product->id,
+                'url' => '/storage/' . $path,
+                'alt' => $product->name,
+                'sort_order' => $lastSort,
+            ]);
+        }
+
+        return back()->with('success', 'Images uploaded successfully!');
+    }
+
+    public function deleteImage(Product $product, ProductImage $image)
+    {
+        if ($image->product_id !== $product->id) {
+            abort(404);
+        }
+
+        if (str_starts_with($image->url, '/storage/')) {
+            Storage::disk('public')->delete(str_replace('/storage/', '', $image->url));
+        }
+
+        $image->delete();
+
+        return back()->with('success', 'Image deleted.');
     }
 }

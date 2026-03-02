@@ -71,6 +71,8 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('/products/{product}/edit', [AdminProductController::class, 'edit'])->name('products.edit');
     Route::put('/products/{product}', [AdminProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [AdminProductController::class, 'destroy'])->name('products.destroy');
+    Route::post('/products/{product}/images', [AdminProductController::class, 'uploadImages'])->name('products.uploadImages');
+    Route::delete('/products/{product}/images/{image}', [AdminProductController::class, 'deleteImage'])->name('products.deleteImage');
 
     // Orders
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');

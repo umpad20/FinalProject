@@ -51,8 +51,20 @@ class DashboardController extends Controller
                 'id' => $p->id,
                 'name' => $p->name,
                 'image' => $p->images->first()?->url,
-                'lowStockVariants' => $p->variants->filter(fn ($v) => $v->stock <= 5)->count(),
+                'variants' => $p->variants->filter(fn ($v) => $v->stock <= 5)->values()->map(fn ($v) => [
+                    'size' => $v->size,
+                    'color' => $v->color,
+                    'stock' => $v->stock,
+                ]),
             ]);
+
+        $orderStatusCounts = [
+            'pending' => Order::where('status', 'pending')->count(),
+            'processing' => Order::where('status', 'processing')->count(),
+            'shipped' => Order::where('status', 'shipped')->count(),
+            'completed' => Order::where('status', 'completed')->count(),
+            'cancelled' => Order::where('status', 'cancelled')->count(),
+        ];
 
         return Inertia::render('admin/dashboard', [
             'stats' => [
@@ -66,6 +78,7 @@ class DashboardController extends Controller
             'recentOrders' => $recentOrders,
             'topProducts' => $topProducts,
             'lowStockProducts' => $lowStockProducts,
+            'orderStatusCounts' => $orderStatusCounts,
         ]);
     }
 }

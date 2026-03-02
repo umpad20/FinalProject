@@ -1,16 +1,40 @@
-import { Head, Link } from '@inertiajs/react';
-import { Eye, MoreHorizontal, Search } from 'lucide-react';
+import { Head, Link, router } from '@inertiajs/react';
+import { Eye, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { formatPrice, mockOrders } from '@/lib/mock-data';
+import { formatPrice } from '@/lib/utils';
 import AdminLayout from '@/layouts/admin-layout';
-import type { OrderStatus } from '@/types/store';
+
+interface OrderItem {
+    id: number;
+    productName: string;
+    productImage: string;
+    size: string;
+    color: string;
+    quantity: number;
+    price: number;
+}
+
+interface OrderRow {
+    id: number;
+    orderNumber: string;
+    customerName: string;
+    customerEmail: string;
+    items: OrderItem[];
+    total: number;
+    status: string;
+    paymentMethod: string;
+    createdAt: string;
+}
+
+interface Props {
+    orders: OrderRow[];
+}
 
 const statusColors: Record<string, string> = {
     pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
@@ -20,11 +44,11 @@ const statusColors: Record<string, string> = {
     cancelled: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
 };
 
-export default function AdminOrders() {
+export default function AdminOrders({ orders }: Props) {
     const [activeTab, setActiveTab] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
 
-    const filteredOrders = mockOrders.filter((order) => {
+    const filteredOrders = orders.filter((order) => {
         if (activeTab !== 'all' && order.status !== activeTab) return false;
         if (searchQuery) {
             const q = searchQuery.toLowerCase();
@@ -33,13 +57,17 @@ export default function AdminOrders() {
         return true;
     });
 
+    const handleStatusChange = (orderId: number, newStatus: string) => {
+        router.patch(`/admin/orders/${orderId}/status`, { status: newStatus }, { preserveScroll: true });
+    };
+
     return (
         <AdminLayout title="Orders">
             <Head title="Admin - Orders" />
 
             <div className="mb-6">
                 <h1 className="text-2xl font-bold">Order Management</h1>
-                <p className="text-sm text-muted-foreground">{mockOrders.length} total orders</p>
+                <p className="text-sm text-muted-foreground">{orders.length} total orders</p>
             </div>
 
             {/* Search */}
@@ -83,41 +111,51 @@ export default function AdminOrders() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {filteredOrders.map((order) => (
-                                        <TableRow key={order.id}>
-                                            <TableCell className="font-medium">{order.orderNumber}</TableCell>
-                                            <TableCell>
-                                                <div>
-                                                    <p className="text-sm font-medium">{order.customerName}</p>
-                                                    <p className="text-xs text-muted-foreground">{order.customerEmail}</p>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>{order.items.length} item{order.items.length > 1 ? 's' : ''}</TableCell>
-                                            <TableCell className="text-right font-semibold">{formatPrice(order.total)}</TableCell>
-                                            <TableCell className="text-center">
-                                                <Select defaultValue={order.status}>
-                                                    <SelectTrigger className="w-[130px]" aria-label="Update order status">
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="pending">Pending</SelectItem>
-                                                        <SelectItem value="processing">Processing</SelectItem>
-                                                        <SelectItem value="shipped">Shipped</SelectItem>
-                                                        <SelectItem value="completed">Completed</SelectItem>
-                                                        <SelectItem value="cancelled">Cancelled</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
-                                            </TableCell>
-                                            <TableCell className="text-sm text-muted-foreground">{order.createdAt}</TableCell>
-                                            <TableCell className="text-center">
-                                                <Button variant="ghost" size="sm" asChild>
-                                                    <Link href={`/admin/orders/${order.id}`}>
-                                                        <Eye className="mr-1 h-4 w-4" /> View
-                                                    </Link>
-                                                </Button>
+                                    {filteredOrders.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={7} className="py-12 text-center text-muted-foreground">
+                                                {orders.length === 0 ? 'No orders yet.' : 'No orders match your filters.'}
                                             </TableCell>
                                         </TableRow>
-                                    ))}
+                                    ) : (
+                                        filteredOrders.map((order) => (
+                                            <TableRow key={order.id}>
+                                                <TableCell className="font-medium">{order.orderNumber}</TableCell>
+                                                <TableCell>
+                                                    <div>
+                                                        <p className="text-sm font-medium">{order.customerName}</p>
+                                                        <p className="text-xs text-muted-foreground">{order.customerEmail}</p>
+                                                    </div>
+                                                </TableCell>
+                                                <TableCell>{order.items.length} item{order.items.length > 1 ? 's' : ''}</TableCell>
+                                                <TableCell className="text-right font-semibold">{formatPrice(order.total)}</TableCell>
+                                                <TableCell className="text-center">
+                                                    <Select defaultValue={order.status} onValueChange={(v) => handleStatusChange(order.id, v)}>
+                                                        <SelectTrigger className="w-[130px]" aria-label="Update order status">
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="pending">Pending</SelectItem>
+                                                            <SelectItem value="processing">Processing</SelectItem>
+                                                            <SelectItem value="shipped">Shipped</SelectItem>
+                                                            <SelectItem value="completed">Completed</SelectItem>
+                                                            <SelectItem value="cancelled">Cancelled</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </TableCell>
+                                                <TableCell className="text-sm text-muted-foreground">
+                                                    {new Date(order.createdAt).toLocaleDateString()}
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    <Button variant="ghost" size="sm" asChild>
+                                                        <Link href={`/admin/orders/${order.id}`}>
+                                                            <Eye className="mr-1 h-4 w-4" /> View
+                                                        </Link>
+                                                    </Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
                                 </TableBody>
                             </Table>
                         </CardContent>

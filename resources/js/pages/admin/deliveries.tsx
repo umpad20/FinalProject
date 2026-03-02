@@ -1,15 +1,26 @@
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { Search, Truck } from 'lucide-react';
 import { useState } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { mockDeliveries } from '@/lib/mock-data';
 import AdminLayout from '@/layouts/admin-layout';
+
+interface DeliveryRow {
+    id: number;
+    orderNumber: string;
+    customerName: string;
+    address: string;
+    status: string;
+    estimatedDate: string | null;
+    trackingNumber: string;
+}
+
+interface Props {
+    deliveries: DeliveryRow[];
+}
 
 const statusColors: Record<string, string> = {
     preparing: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
@@ -18,11 +29,11 @@ const statusColors: Record<string, string> = {
     returned: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
 };
 
-export default function AdminDeliveries() {
+export default function AdminDeliveries({ deliveries }: Props) {
     const [activeTab, setActiveTab] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
 
-    const filteredDeliveries = mockDeliveries.filter((d) => {
+    const filteredDeliveries = deliveries.filter((d) => {
         if (activeTab !== 'all' && d.status !== activeTab) return false;
         if (searchQuery) {
             const q = searchQuery.toLowerCase();
@@ -30,6 +41,17 @@ export default function AdminDeliveries() {
         }
         return true;
     });
+
+    const handleStatusChange = (deliveryId: number, newStatus: string) => {
+        router.patch(`/admin/deliveries/${deliveryId}`, { status: newStatus }, { preserveScroll: true });
+    };
+
+    const statusCounts = {
+        preparing: deliveries.filter((d) => d.status === 'preparing').length,
+        'in-transit': deliveries.filter((d) => d.status === 'in-transit').length,
+        delivered: deliveries.filter((d) => d.status === 'delivered').length,
+        returned: deliveries.filter((d) => d.status === 'returned').length,
+    };
 
     return (
         <AdminLayout title="Deliveries">
@@ -43,10 +65,10 @@ export default function AdminDeliveries() {
             {/* Stats */}
             <div className="mb-6 grid gap-4 sm:grid-cols-4">
                 {[
-                    { label: 'Preparing', count: mockDeliveries.filter((d) => d.status === 'preparing').length, color: 'text-yellow-600' },
-                    { label: 'In Transit', count: mockDeliveries.filter((d) => d.status === 'in-transit').length, color: 'text-blue-600' },
-                    { label: 'Delivered', count: mockDeliveries.filter((d) => d.status === 'delivered').length, color: 'text-green-600' },
-                    { label: 'Returned', count: mockDeliveries.filter((d) => d.status === 'returned').length, color: 'text-red-600' },
+                    { label: 'Preparing', count: statusCounts.preparing, color: 'text-yellow-600' },
+                    { label: 'In Transit', count: statusCounts['in-transit'], color: 'text-blue-600' },
+                    { label: 'Delivered', count: statusCounts.delivered, color: 'text-green-600' },
+                    { label: 'Returned', count: statusCounts.returned, color: 'text-red-600' },
                 ].map((stat) => (
                     <Card key={stat.label}>
                         <CardContent className="flex items-center gap-3 p-4">
@@ -101,33 +123,41 @@ export default function AdminDeliveries() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                    {filteredDeliveries.map((delivery) => (
-                                        <TableRow key={delivery.id}>
-                                            <TableCell className="font-medium">{delivery.orderNumber}</TableCell>
-                                            <TableCell>{delivery.customerName}</TableCell>
-                                            <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground">{delivery.address}</TableCell>
-                                            <TableCell className="font-mono text-xs">{delivery.trackingNumber}</TableCell>
-                                            <TableCell className="text-sm">{delivery.estimatedDate}</TableCell>
-                                            <TableCell className="text-center">
-                                                <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[delivery.status]}`}>
-                                                    {delivery.status === 'in-transit' ? 'In Transit' : delivery.status.charAt(0).toUpperCase() + delivery.status.slice(1)}
-                                                </span>
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                <Select defaultValue={delivery.status}>
-                                                    <SelectTrigger className="w-[130px]" aria-label="Update delivery status">
-                                                        <SelectValue />
-                                                    </SelectTrigger>
-                                                    <SelectContent>
-                                                        <SelectItem value="preparing">Preparing</SelectItem>
-                                                        <SelectItem value="in-transit">In Transit</SelectItem>
-                                                        <SelectItem value="delivered">Delivered</SelectItem>
-                                                        <SelectItem value="returned">Returned</SelectItem>
-                                                    </SelectContent>
-                                                </Select>
+                                    {filteredDeliveries.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={7} className="py-12 text-center text-muted-foreground">
+                                                {deliveries.length === 0 ? 'No deliveries yet.' : 'No deliveries match your filters.'}
                                             </TableCell>
                                         </TableRow>
-                                    ))}
+                                    ) : (
+                                        filteredDeliveries.map((delivery) => (
+                                            <TableRow key={delivery.id}>
+                                                <TableCell className="font-medium">{delivery.orderNumber}</TableCell>
+                                                <TableCell>{delivery.customerName}</TableCell>
+                                                <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground">{delivery.address}</TableCell>
+                                                <TableCell className="font-mono text-xs">{delivery.trackingNumber}</TableCell>
+                                                <TableCell className="text-sm">{delivery.estimatedDate ?? '—'}</TableCell>
+                                                <TableCell className="text-center">
+                                                    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${statusColors[delivery.status] ?? ''}`}>
+                                                        {delivery.status === 'in-transit' ? 'In Transit' : delivery.status.charAt(0).toUpperCase() + delivery.status.slice(1)}
+                                                    </span>
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    <Select defaultValue={delivery.status} onValueChange={(v) => handleStatusChange(delivery.id, v)}>
+                                                        <SelectTrigger className="w-[130px]" aria-label="Update delivery status">
+                                                            <SelectValue />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            <SelectItem value="preparing">Preparing</SelectItem>
+                                                            <SelectItem value="in-transit">In Transit</SelectItem>
+                                                            <SelectItem value="delivered">Delivered</SelectItem>
+                                                            <SelectItem value="returned">Returned</SelectItem>
+                                                        </SelectContent>
+                                                    </Select>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    )}
                                 </TableBody>
                             </Table>
                         </CardContent>

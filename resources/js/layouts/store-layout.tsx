@@ -45,6 +45,7 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
     const page = usePage();
     const auth = (page.props as any).auth;
     const user = auth?.user;
+    const cartCount = (page.props as any).cartCount ?? 0;
 
     const isDark = appearance === 'dark' || (appearance === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches);
 
@@ -138,9 +139,11 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
                             <Button variant="ghost" size="icon" className="relative" asChild aria-label="Shopping cart">
                                 <Link href="/cart">
                                     <ShoppingBag className="h-5 w-5" />
-                                    <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
-                                        3
-                                    </span>
+                                    {cartCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                                            {cartCount}
+                                        </span>
+                                    )}
                                 </Link>
                             </Button>
 
@@ -153,8 +156,19 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" className="w-48">
-                                        <div className="px-2 py-1.5 text-sm font-medium">{user.name}</div>
+                                        <div className="px-2 py-1.5">
+                                            <p className="text-sm font-medium">{user.name}</p>
+                                            <p className="text-xs text-muted-foreground">{user.email}</p>
+                                        </div>
                                         <DropdownMenuSeparator />
+                                        {user.is_admin && (
+                                            <>
+                                                <DropdownMenuItem asChild>
+                                                    <Link href="/admin/dashboard">Admin Panel</Link>
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator />
+                                            </>
+                                        )}
                                         <DropdownMenuItem asChild>
                                             <Link href="/customer/dashboard">My Dashboard</Link>
                                         </DropdownMenuItem>
