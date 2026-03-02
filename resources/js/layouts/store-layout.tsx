@@ -11,16 +11,7 @@ import {
     X,
 } from 'lucide-react';
 import { useState } from 'react';
-import { useAppearance } from '@/hooks/use-appearance';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from '@/components/ui/sheet';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -28,6 +19,14 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+} from '@/components/ui/sheet';
+import { useAppearance } from '@/hooks/use-appearance';
 
 const navLinks = [
     { name: 'Home', href: '/' },
@@ -38,7 +37,11 @@ const navLinks = [
     { name: 'Dresses', href: '/shop?category=Dresses' },
 ];
 
-export default function StoreLayout({ children }: { children: React.ReactNode }) {
+export default function StoreLayout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
     const { appearance, updateAppearance } = useAppearance();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
@@ -47,7 +50,11 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
     const user = auth?.user;
     const cartCount = (page.props as any).cartCount ?? 0;
 
-    const isDark = appearance === 'dark' || (appearance === 'system' && typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const isDark =
+        appearance === 'dark' ||
+        (appearance === 'system' &&
+            typeof window !== 'undefined' &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches);
 
     const toggleTheme = () => {
         updateAppearance(isDark ? 'light' : 'dark');
@@ -58,7 +65,7 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
             {/* Skip to main content for WCAG */}
             <a
                 href="#main-content"
-                className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
+                className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
             >
                 Skip to main content
             </a>
@@ -66,12 +73,16 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
             {/* Top announcement bar */}
             <div className="border-b border-border bg-primary text-primary-foreground">
                 <div className="mx-auto max-w-7xl px-4 py-2 text-center text-sm font-medium">
-                    Free shipping on orders over ₱2,000 | Use code <strong>JAYPEE10</strong> for 10% off
+                    Free shipping on orders over ₱2,000 | Use code{' '}
+                    <strong>JAYPEE10</strong> for 10% off
                 </div>
             </div>
 
             {/* Header */}
-            <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60" role="banner">
+            <header
+                className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+                role="banner"
+            >
                 <div className="mx-auto max-w-7xl px-4">
                     <div className="flex h-16 items-center justify-between">
                         {/* Mobile menu button */}
@@ -86,15 +97,24 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
                         </Button>
 
                         {/* Logo */}
-                        <Link href="/" className="flex items-center gap-2" aria-label="Jaypee Clothing Store Home">
+                        <Link
+                            href="/"
+                            className="flex items-center gap-2"
+                            aria-label="Jaypee Clothing Store Home"
+                        >
                             <ShoppingBag className="h-7 w-7" />
                             <span className="text-lg font-semibold tracking-tight">
-                                Jaypee<span className="font-light">Clothing</span>
+                                Jaypee
+                                <span className="font-light">Clothing</span>
                             </span>
                         </Link>
 
                         {/* Desktop Navigation */}
-                        <nav className="hidden lg:flex lg:items-center lg:gap-6" role="navigation" aria-label="Main navigation">
+                        <nav
+                            className="hidden lg:flex lg:items-center lg:gap-6"
+                            role="navigation"
+                            aria-label="Main navigation"
+                        >
                             {navLinks.map((link) => (
                                 <Link
                                     key={link.name}
@@ -123,20 +143,39 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
                                 variant="ghost"
                                 size="icon"
                                 onClick={toggleTheme}
-                                aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                                aria-label={
+                                    isDark
+                                        ? 'Switch to light mode'
+                                        : 'Switch to dark mode'
+                                }
                             >
-                                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                                {isDark ? (
+                                    <Sun className="h-5 w-5" />
+                                ) : (
+                                    <Moon className="h-5 w-5" />
+                                )}
                             </Button>
 
                             {/* Wishlist */}
-                            <Button variant="ghost" size="icon" asChild aria-label="Wishlist">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                asChild
+                                aria-label="Wishlist"
+                            >
                                 <Link href="/shop">
                                     <Heart className="h-5 w-5" />
                                 </Link>
                             </Button>
 
                             {/* Cart */}
-                            <Button variant="ghost" size="icon" className="relative" asChild aria-label="Shopping cart">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="relative"
+                                asChild
+                                aria-label="Shopping cart"
+                            >
                                 <Link href="/cart">
                                     <ShoppingBag className="h-5 w-5" />
                                     {cartCount > 0 && (
@@ -151,43 +190,72 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
                             {user ? (
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="ghost" size="icon" aria-label="User menu">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            aria-label="User menu"
+                                        >
                                             <User className="h-5 w-5" />
                                         </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end" className="w-48">
+                                    <DropdownMenuContent
+                                        align="end"
+                                        className="w-48"
+                                    >
                                         <div className="px-2 py-1.5">
-                                            <p className="text-sm font-medium">{user.name}</p>
-                                            <p className="text-xs text-muted-foreground">{user.email}</p>
+                                            <p className="text-sm font-medium">
+                                                {user.name}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">
+                                                {user.email}
+                                            </p>
                                         </div>
                                         <DropdownMenuSeparator />
                                         {user.is_admin && (
                                             <>
                                                 <DropdownMenuItem asChild>
-                                                    <Link href="/admin/dashboard">Admin Panel</Link>
+                                                    <Link href="/admin/dashboard">
+                                                        Admin Panel
+                                                    </Link>
                                                 </DropdownMenuItem>
                                                 <DropdownMenuSeparator />
                                             </>
                                         )}
                                         <DropdownMenuItem asChild>
-                                            <Link href="/customer/dashboard">My Dashboard</Link>
+                                            <Link href="/customer/dashboard">
+                                                My Dashboard
+                                            </Link>
                                         </DropdownMenuItem>
                                         <DropdownMenuItem asChild>
-                                            <Link href="/customer/orders">My Orders</Link>
+                                            <Link href="/customer/orders">
+                                                My Orders
+                                            </Link>
                                         </DropdownMenuItem>
                                         <DropdownMenuItem asChild>
-                                            <Link href="/settings/profile">Settings</Link>
+                                            <Link href="/settings/profile">
+                                                Settings
+                                            </Link>
                                         </DropdownMenuItem>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem asChild>
-                                            <Link href="/logout" method="post" as="button" className="w-full">
+                                            <Link
+                                                href="/logout"
+                                                method="post"
+                                                as="button"
+                                                className="w-full"
+                                            >
                                                 Log Out
                                             </Link>
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             ) : (
-                                <Button variant="ghost" size="icon" asChild aria-label="Log in">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    asChild
+                                    aria-label="Log in"
+                                >
                                     <Link href="/login">
                                         <LogIn className="h-5 w-5" />
                                     </Link>
@@ -200,18 +268,18 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
                     {searchOpen && (
                         <div className="border-t border-border py-3">
                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                                <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                                 <Input
                                     type="search"
                                     placeholder="Search for clothing..."
-                                    className="pl-10 pr-10"
+                                    className="pr-10 pl-10"
                                     autoFocus
                                     aria-label="Search products"
                                 />
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="absolute right-0 top-0 h-full"
+                                    className="absolute top-0 right-0 h-full"
                                     onClick={() => setSearchOpen(false)}
                                     aria-label="Close search"
                                 >
@@ -232,7 +300,11 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
                             JaypeeClothing
                         </SheetTitle>
                     </SheetHeader>
-                    <nav className="mt-6 flex flex-col gap-1" role="navigation" aria-label="Mobile navigation">
+                    <nav
+                        className="mt-6 flex flex-col gap-1"
+                        role="navigation"
+                        aria-label="Mobile navigation"
+                    >
                         {navLinks.map((link) => (
                             <Link
                                 key={link.name}
@@ -272,7 +344,10 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
             </main>
 
             {/* Footer */}
-            <footer className="border-t border-border bg-background" role="contentinfo">
+            <footer
+                className="border-t border-border bg-background"
+                role="contentinfo"
+            >
                 <div className="mx-auto max-w-7xl px-4 py-12">
                     <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
                         {/* Brand */}
@@ -280,49 +355,108 @@ export default function StoreLayout({ children }: { children: React.ReactNode })
                             <div className="flex items-center gap-2">
                                 <ShoppingBag className="h-6 w-6" />
                                 <span className="text-lg font-semibold">
-                                    Jaypee<span className="font-light">Clothing</span>
+                                    Jaypee
+                                    <span className="font-light">Clothing</span>
                                 </span>
                             </div>
                             <p className="text-sm text-muted-foreground">
-                                Your go-to destination for stylish, affordable clothing. Quality fashion for everyone.
+                                Your go-to destination for stylish, affordable
+                                clothing. Quality fashion for everyone.
                             </p>
                         </div>
 
                         {/* Quick Links */}
                         <div>
-                            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider">Quick Links</h3>
+                            <h3 className="mb-4 text-sm font-semibold tracking-wider uppercase">
+                                Quick Links
+                            </h3>
                             <ul className="space-y-2">
-                                <li><Link href="/shop" className="text-sm text-muted-foreground hover:text-foreground">Shop All</Link></li>
-                                <li><Link href="/shop?category=T-Shirts" className="text-sm text-muted-foreground hover:text-foreground">T-Shirts</Link></li>
-                                <li><Link href="/shop?category=Pants" className="text-sm text-muted-foreground hover:text-foreground">Pants</Link></li>
-                                <li><Link href="/shop?category=Jackets" className="text-sm text-muted-foreground hover:text-foreground">Jackets</Link></li>
+                                <li>
+                                    <Link
+                                        href="/shop"
+                                        className="text-sm text-muted-foreground hover:text-foreground"
+                                    >
+                                        Shop All
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        href="/shop?category=T-Shirts"
+                                        className="text-sm text-muted-foreground hover:text-foreground"
+                                    >
+                                        T-Shirts
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        href="/shop?category=Pants"
+                                        className="text-sm text-muted-foreground hover:text-foreground"
+                                    >
+                                        Pants
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        href="/shop?category=Jackets"
+                                        className="text-sm text-muted-foreground hover:text-foreground"
+                                    >
+                                        Jackets
+                                    </Link>
+                                </li>
                             </ul>
                         </div>
 
                         {/* Support */}
                         <div>
-                            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider">Support</h3>
+                            <h3 className="mb-4 text-sm font-semibold tracking-wider uppercase">
+                                Support
+                            </h3>
                             <ul className="space-y-2">
-                                <li><span className="text-sm text-muted-foreground">Contact Us</span></li>
-                                <li><span className="text-sm text-muted-foreground">Shipping Info</span></li>
-                                <li><span className="text-sm text-muted-foreground">Returns & Exchanges</span></li>
-                                <li><span className="text-sm text-muted-foreground">FAQ</span></li>
+                                <li>
+                                    <span className="text-sm text-muted-foreground">
+                                        Contact Us
+                                    </span>
+                                </li>
+                                <li>
+                                    <span className="text-sm text-muted-foreground">
+                                        Shipping Info
+                                    </span>
+                                </li>
+                                <li>
+                                    <span className="text-sm text-muted-foreground">
+                                        Returns & Exchanges
+                                    </span>
+                                </li>
+                                <li>
+                                    <span className="text-sm text-muted-foreground">
+                                        FAQ
+                                    </span>
+                                </li>
                             </ul>
                         </div>
 
                         {/* Contact */}
                         <div>
-                            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider">Contact</h3>
+                            <h3 className="mb-4 text-sm font-semibold tracking-wider uppercase">
+                                Contact
+                            </h3>
                             <ul className="space-y-2">
-                                <li className="text-sm text-muted-foreground">jaypee@clothing.com</li>
-                                <li className="text-sm text-muted-foreground">+63 912 345 6789</li>
-                                <li className="text-sm text-muted-foreground">Manila, Philippines</li>
+                                <li className="text-sm text-muted-foreground">
+                                    jaypee@clothing.com
+                                </li>
+                                <li className="text-sm text-muted-foreground">
+                                    +63 912 345 6789
+                                </li>
+                                <li className="text-sm text-muted-foreground">
+                                    Manila, Philippines
+                                </li>
                             </ul>
                         </div>
                     </div>
 
                     <div className="mt-8 border-t border-border pt-8 text-center text-sm text-muted-foreground">
-                        &copy; {new Date().getFullYear()} Jaypee Clothing Store. All rights reserved.
+                        &copy; {new Date().getFullYear()} Jaypee Clothing Store.
+                        All rights reserved.
                     </div>
                 </div>
             </footer>

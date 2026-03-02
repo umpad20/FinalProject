@@ -1,17 +1,35 @@
-import { Head, Link, router } from '@inertiajs/react';
-import { Grid3X3, LayoutList, Search, SlidersHorizontal, X } from 'lucide-react';
+import { Head, Link } from '@inertiajs/react';
+import {
+    Grid3X3,
+    LayoutList,
+    Search,
+    SlidersHorizontal,
+    X,
+} from 'lucide-react';
 import { useMemo, useState } from 'react';
 import ProductCard from '@/components/product-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { mockCategories, mockProducts } from '@/lib/mock-data';
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from '@/components/ui/sheet';
 import StoreLayout from '@/layouts/store-layout';
+import { mockCategories, mockProducts } from '@/lib/mock-data';
 
 const allSizes = ['XS', 'S', 'M', 'L', 'XL'];
 const allColors = [
@@ -29,7 +47,9 @@ type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'name-asc';
 
 export default function Shop({ category }: { category?: string }) {
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState<string>(category || '');
+    const [selectedCategory, setSelectedCategory] = useState<string>(
+        category || '',
+    );
     const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
     const [selectedColors, setSelectedColors] = useState<string[]>([]);
     const [sortBy, setSortBy] = useState<SortOption>('newest');
@@ -37,13 +57,17 @@ export default function Shop({ category }: { category?: string }) {
 
     const toggleSize = (size: string) => {
         setSelectedSizes((prev) =>
-            prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size],
+            prev.includes(size)
+                ? prev.filter((s) => s !== size)
+                : [...prev, size],
         );
     };
 
     const toggleColor = (color: string) => {
         setSelectedColors((prev) =>
-            prev.includes(color) ? prev.filter((c) => c !== color) : [...prev, color],
+            prev.includes(color)
+                ? prev.filter((c) => c !== color)
+                : [...prev, color],
         );
     };
 
@@ -54,7 +78,11 @@ export default function Shop({ category }: { category?: string }) {
         setSelectedColors([]);
     };
 
-    const hasActiveFilters = searchQuery || selectedCategory || selectedSizes.length > 0 || selectedColors.length > 0;
+    const hasActiveFilters =
+        searchQuery ||
+        selectedCategory ||
+        selectedSizes.length > 0 ||
+        selectedColors.length > 0;
 
     const filteredProducts = useMemo(() => {
         let products = [...mockProducts];
@@ -77,7 +105,9 @@ export default function Shop({ category }: { category?: string }) {
 
         // Sizes
         if (selectedSizes.length > 0) {
-            products = products.filter((p) => p.sizes.some((s) => selectedSizes.includes(s)));
+            products = products.filter((p) =>
+                p.sizes.some((s) => selectedSizes.includes(s)),
+            );
         }
 
         // Colors
@@ -100,20 +130,29 @@ export default function Shop({ category }: { category?: string }) {
                 break;
             case 'newest':
             default:
-                products.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+                products.sort(
+                    (a, b) =>
+                        new Date(b.createdAt).getTime() -
+                        new Date(a.createdAt).getTime(),
+                );
                 break;
         }
 
         return products;
     }, [searchQuery, selectedCategory, selectedSizes, selectedColors, sortBy]);
 
-    const FiltersContent = () => (
+    const filtersContent = (
         <div className="space-y-6">
             {/* Search */}
             <div>
-                <Label htmlFor="filter-search" className="mb-2 block text-sm font-semibold">Search</Label>
+                <Label
+                    htmlFor="filter-search"
+                    className="mb-2 block text-sm font-semibold"
+                >
+                    Search
+                </Label>
                 <div className="relative">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                         id="filter-search"
                         placeholder="Search products..."
@@ -143,7 +182,9 @@ export default function Shop({ category }: { category?: string }) {
                             onClick={() => setSelectedCategory(cat.name)}
                         >
                             <span>{cat.name}</span>
-                            <span className="text-xs text-muted-foreground">{cat.productCount}</span>
+                            <span className="text-xs text-muted-foreground">
+                                {cat.productCount}
+                            </span>
                         </button>
                     ))}
                 </div>
@@ -178,7 +219,7 @@ export default function Shop({ category }: { category?: string }) {
                     {allColors.map((color) => (
                         <button
                             key={color.name}
-                            className={`flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all ${selectedColors.includes(color.name) ? 'border-primary scale-110' : 'border-transparent hover:border-muted-foreground/30'}`}
+                            className={`flex h-8 w-8 items-center justify-center rounded-full border-2 transition-all ${selectedColors.includes(color.name) ? 'scale-110 border-primary' : 'border-transparent hover:border-muted-foreground/30'}`}
                             onClick={() => toggleColor(color.name)}
                             aria-pressed={selectedColors.includes(color.name)}
                             aria-label={`Color ${color.name}`}
@@ -196,7 +237,11 @@ export default function Shop({ category }: { category?: string }) {
             {hasActiveFilters && (
                 <>
                     <Separator />
-                    <Button variant="outline" className="w-full" onClick={clearFilters}>
+                    <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={clearFilters}
+                    >
                         <X className="mr-2 h-4 w-4" /> Clear All Filters
                     </Button>
                 </>
@@ -210,20 +255,35 @@ export default function Shop({ category }: { category?: string }) {
 
             <div className="mx-auto max-w-7xl px-4 py-8">
                 {/* Breadcrumb */}
-                <nav className="mb-6 text-sm text-muted-foreground" aria-label="Breadcrumb">
+                <nav
+                    className="mb-6 text-sm text-muted-foreground"
+                    aria-label="Breadcrumb"
+                >
                     <ol className="flex items-center gap-2">
-                        <li><Link href="/" className="hover:text-foreground">Home</Link></li>
+                        <li>
+                            <Link href="/" className="hover:text-foreground">
+                                Home
+                            </Link>
+                        </li>
                         <li>/</li>
-                        <li className="text-foreground font-medium">{selectedCategory || 'Shop'}</li>
+                        <li className="font-medium text-foreground">
+                            {selectedCategory || 'Shop'}
+                        </li>
                     </ol>
                 </nav>
 
                 <div className="flex gap-8">
                     {/* Desktop sidebar filters */}
-                    <aside className="hidden w-64 shrink-0 lg:block" role="complementary" aria-label="Product filters">
+                    <aside
+                        className="hidden w-64 shrink-0 lg:block"
+                        role="complementary"
+                        aria-label="Product filters"
+                    >
                         <div className="sticky top-20">
-                            <h2 className="mb-4 text-lg font-semibold">Filters</h2>
-                            <FiltersContent />
+                            <h2 className="mb-4 text-lg font-semibold">
+                                Filters
+                            </h2>
+                            {filtersContent}
                         </div>
                     </aside>
 
@@ -235,44 +295,72 @@ export default function Shop({ category }: { category?: string }) {
                                 {/* Mobile filter trigger */}
                                 <Sheet>
                                     <SheetTrigger asChild>
-                                        <Button variant="outline" size="sm" className="lg:hidden">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            className="lg:hidden"
+                                        >
                                             <SlidersHorizontal className="mr-2 h-4 w-4" />
                                             Filters
                                         </Button>
                                     </SheetTrigger>
-                                    <SheetContent side="left" className="w-80 overflow-y-auto">
+                                    <SheetContent
+                                        side="left"
+                                        className="w-80 overflow-y-auto"
+                                    >
                                         <SheetHeader>
                                             <SheetTitle>Filters</SheetTitle>
                                         </SheetHeader>
                                         <div className="mt-4">
-                                            <FiltersContent />
+                                            {filtersContent}
                                         </div>
                                     </SheetContent>
                                 </Sheet>
 
                                 <p className="text-sm text-muted-foreground">
-                                    <span className="font-medium text-foreground">{filteredProducts.length}</span> products
+                                    <span className="font-medium text-foreground">
+                                        {filteredProducts.length}
+                                    </span>{' '}
+                                    products
                                 </p>
                             </div>
 
                             <div className="flex items-center gap-2">
                                 {/* Sort */}
-                                <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
-                                    <SelectTrigger className="w-[160px]" aria-label="Sort products">
+                                <Select
+                                    value={sortBy}
+                                    onValueChange={(v) =>
+                                        setSortBy(v as SortOption)
+                                    }
+                                >
+                                    <SelectTrigger
+                                        className="w-[160px]"
+                                        aria-label="Sort products"
+                                    >
                                         <SelectValue placeholder="Sort by" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="newest">Newest</SelectItem>
-                                        <SelectItem value="price-asc">Price: Low to High</SelectItem>
-                                        <SelectItem value="price-desc">Price: High to Low</SelectItem>
-                                        <SelectItem value="name-asc">Name: A-Z</SelectItem>
+                                        <SelectItem value="newest">
+                                            Newest
+                                        </SelectItem>
+                                        <SelectItem value="price-asc">
+                                            Price: Low to High
+                                        </SelectItem>
+                                        <SelectItem value="price-desc">
+                                            Price: High to Low
+                                        </SelectItem>
+                                        <SelectItem value="name-asc">
+                                            Name: A-Z
+                                        </SelectItem>
                                     </SelectContent>
                                 </Select>
 
                                 {/* Grid toggle (desktop) */}
                                 <div className="hidden items-center gap-1 md:flex">
                                     <Button
-                                        variant={gridCols === 3 ? 'default' : 'ghost'}
+                                        variant={
+                                            gridCols === 3 ? 'default' : 'ghost'
+                                        }
                                         size="icon"
                                         className="h-8 w-8"
                                         onClick={() => setGridCols(3)}
@@ -281,7 +369,9 @@ export default function Shop({ category }: { category?: string }) {
                                         <LayoutList className="h-4 w-4" />
                                     </Button>
                                     <Button
-                                        variant={gridCols === 4 ? 'default' : 'ghost'}
+                                        variant={
+                                            gridCols === 4 ? 'default' : 'ghost'
+                                        }
                                         size="icon"
                                         className="h-8 w-8"
                                         onClick={() => setGridCols(4)}
@@ -297,33 +387,61 @@ export default function Shop({ category }: { category?: string }) {
                         {hasActiveFilters && (
                             <div className="mb-4 flex flex-wrap items-center gap-2">
                                 {selectedCategory && (
-                                    <Badge variant="secondary" className="gap-1">
+                                    <Badge
+                                        variant="secondary"
+                                        className="gap-1"
+                                    >
                                         {selectedCategory}
-                                        <button onClick={() => setSelectedCategory('')} aria-label={`Remove ${selectedCategory} filter`}>
+                                        <button
+                                            onClick={() =>
+                                                setSelectedCategory('')
+                                            }
+                                            aria-label={`Remove ${selectedCategory} filter`}
+                                        >
                                             <X className="h-3 w-3" />
                                         </button>
                                     </Badge>
                                 )}
                                 {selectedSizes.map((s) => (
-                                    <Badge key={s} variant="secondary" className="gap-1">
+                                    <Badge
+                                        key={s}
+                                        variant="secondary"
+                                        className="gap-1"
+                                    >
                                         Size: {s}
-                                        <button onClick={() => toggleSize(s)} aria-label={`Remove size ${s} filter`}>
+                                        <button
+                                            onClick={() => toggleSize(s)}
+                                            aria-label={`Remove size ${s} filter`}
+                                        >
                                             <X className="h-3 w-3" />
                                         </button>
                                     </Badge>
                                 ))}
                                 {selectedColors.map((c) => (
-                                    <Badge key={c} variant="secondary" className="gap-1">
+                                    <Badge
+                                        key={c}
+                                        variant="secondary"
+                                        className="gap-1"
+                                    >
                                         {c}
-                                        <button onClick={() => toggleColor(c)} aria-label={`Remove ${c} color filter`}>
+                                        <button
+                                            onClick={() => toggleColor(c)}
+                                            aria-label={`Remove ${c} color filter`}
+                                        >
                                             <X className="h-3 w-3" />
                                         </button>
                                     </Badge>
                                 ))}
                                 {searchQuery && (
-                                    <Badge variant="secondary" className="gap-1">
+                                    <Badge
+                                        variant="secondary"
+                                        className="gap-1"
+                                    >
                                         &ldquo;{searchQuery}&rdquo;
-                                        <button onClick={() => setSearchQuery('')} aria-label="Remove search filter">
+                                        <button
+                                            onClick={() => setSearchQuery('')}
+                                            aria-label="Remove search filter"
+                                        >
                                             <X className="h-3 w-3" />
                                         </button>
                                     </Badge>
@@ -337,17 +455,29 @@ export default function Shop({ category }: { category?: string }) {
                                 className={`grid gap-4 ${gridCols === 3 ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}`}
                             >
                                 {filteredProducts.map((product) => (
-                                    <ProductCard key={product.id} product={product} />
+                                    <ProductCard
+                                        key={product.id}
+                                        product={product}
+                                    />
                                 ))}
                             </div>
                         ) : (
-                            <div className="flex flex-col items-center justify-center py-20 text-center" role="status">
+                            <div
+                                className="flex flex-col items-center justify-center py-20 text-center"
+                                role="status"
+                            >
                                 <Search className="mb-4 h-12 w-12 text-muted-foreground/30" />
-                                <h3 className="text-lg font-semibold">No products found</h3>
+                                <h3 className="text-lg font-semibold">
+                                    No products found
+                                </h3>
                                 <p className="mt-1 text-sm text-muted-foreground">
                                     Try adjusting your filters or search query
                                 </p>
-                                <Button variant="outline" className="mt-4" onClick={clearFilters}>
+                                <Button
+                                    variant="outline"
+                                    className="mt-4"
+                                    onClick={clearFilters}
+                                >
                                     Clear Filters
                                 </Button>
                             </div>

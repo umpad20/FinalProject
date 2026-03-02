@@ -1,9 +1,9 @@
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, CheckCircle2, Circle, Clock, Package, Truck } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Clock, Package, Truck } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { formatPrice, mockOrders } from '@/lib/mock-data';
 import StoreLayout from '@/layouts/store-layout';
+import { formatPrice, mockOrders } from '@/lib/mock-data';
 
 const statusSteps = [
     { key: 'pending', label: 'Order Placed', icon: Clock },
@@ -23,22 +23,35 @@ export default function OrderDetail({ id }: { id?: number }) {
             <Head title={`Order ${order.orderNumber}`} />
 
             <div className="mx-auto max-w-4xl px-4 py-8">
-                <Link href="/customer/orders" className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground">
+                <Link
+                    href="/customer/orders"
+                    className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+                >
                     <ArrowLeft className="h-4 w-4" /> Back to orders
                 </Link>
 
                 <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold">{order.orderNumber}</h1>
-                        <p className="text-sm text-muted-foreground">Placed on {order.createdAt}</p>
+                        <h1 className="text-2xl font-bold">
+                            {order.orderNumber}
+                        </h1>
+                        <p className="text-sm text-muted-foreground">
+                            Placed on {order.createdAt}
+                        </p>
                     </div>
-                    <span className={`inline-flex w-fit items-center rounded-full px-3 py-1 text-sm font-medium ${
-                        order.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                        order.status === 'processing' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                        order.status === 'shipped' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
-                        'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                    }`}>
-                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                    <span
+                        className={`inline-flex w-fit items-center rounded-full px-3 py-1 text-sm font-medium ${
+                            order.status === 'completed'
+                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                                : order.status === 'processing'
+                                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                                  : order.status === 'shipped'
+                                    ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
+                                    : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                        }`}
+                    >
+                        {order.status.charAt(0).toUpperCase() +
+                            order.status.slice(1)}
                     </span>
                 </div>
 
@@ -51,19 +64,30 @@ export default function OrderDetail({ id }: { id?: number }) {
                                     const isCompleted = i <= currentStepIndex;
                                     const isCurrent = i === currentStepIndex;
                                     return (
-                                        <div key={step.key} className="flex flex-1 items-center">
+                                        <div
+                                            key={step.key}
+                                            className="flex flex-1 items-center"
+                                        >
                                             <div className="flex flex-col items-center gap-2">
-                                                <div className={`flex h-10 w-10 items-center justify-center rounded-full ${
-                                                    isCompleted ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
-                                                }`}>
+                                                <div
+                                                    className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                                                        isCompleted
+                                                            ? 'bg-primary text-primary-foreground'
+                                                            : 'bg-muted text-muted-foreground'
+                                                    }`}
+                                                >
                                                     <step.icon className="h-5 w-5" />
                                                 </div>
-                                                <span className={`text-xs font-medium ${isCurrent ? 'text-primary' : isCompleted ? 'text-foreground' : 'text-muted-foreground'}`}>
+                                                <span
+                                                    className={`text-xs font-medium ${isCurrent ? 'text-primary' : isCompleted ? 'text-foreground' : 'text-muted-foreground'}`}
+                                                >
                                                     {step.label}
                                                 </span>
                                             </div>
                                             {i < statusSteps.length - 1 && (
-                                                <div className={`mx-2 h-0.5 flex-1 ${i < currentStepIndex ? 'bg-primary' : 'bg-muted'}`} />
+                                                <div
+                                                    className={`mx-2 h-0.5 flex-1 ${i < currentStepIndex ? 'bg-primary' : 'bg-muted'}`}
+                                                />
                                             )}
                                         </div>
                                     );
@@ -82,20 +106,38 @@ export default function OrderDetail({ id }: { id?: number }) {
                         <CardContent>
                             <div className="divide-y divide-border">
                                 {order.items.map((item) => (
-                                    <div key={item.id} className="flex items-center gap-4 py-4 first:pt-0 last:pb-0">
+                                    <div
+                                        key={item.id}
+                                        className="flex items-center gap-4 py-4 first:pt-0 last:pb-0"
+                                    >
                                         <div className="h-20 w-16 shrink-0 overflow-hidden rounded-md bg-muted">
-                                            <img src={item.productImage} alt={item.productName} className="h-full w-full object-cover" />
+                                            <img
+                                                src={item.productImage}
+                                                alt={item.productName}
+                                                className="h-full w-full object-cover"
+                                            />
                                         </div>
                                         <div className="flex-1">
-                                            <p className="font-medium">{item.productName}</p>
-                                            <p className="text-sm text-muted-foreground">
-                                                Size: {item.size} &middot; Color: {item.color}
+                                            <p className="font-medium">
+                                                {item.productName}
                                             </p>
-                                            <p className="text-sm text-muted-foreground">Qty: {item.quantity}</p>
+                                            <p className="text-sm text-muted-foreground">
+                                                Size: {item.size} &middot;
+                                                Color: {item.color}
+                                            </p>
+                                            <p className="text-sm text-muted-foreground">
+                                                Qty: {item.quantity}
+                                            </p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="font-semibold">{formatPrice(item.price * item.quantity)}</p>
-                                            <p className="text-xs text-muted-foreground">{formatPrice(item.price)} each</p>
+                                            <p className="font-semibold">
+                                                {formatPrice(
+                                                    item.price * item.quantity,
+                                                )}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">
+                                                {formatPrice(item.price)} each
+                                            </p>
                                         </div>
                                     </div>
                                 ))}
@@ -105,11 +147,15 @@ export default function OrderDetail({ id }: { id?: number }) {
 
                             <div className="space-y-2">
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">Subtotal</span>
+                                    <span className="text-muted-foreground">
+                                        Subtotal
+                                    </span>
                                     <span>{formatPrice(order.total)}</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">Shipping</span>
+                                    <span className="text-muted-foreground">
+                                        Shipping
+                                    </span>
                                     <span>Free</span>
                                 </div>
                                 <Separator />
@@ -127,9 +173,15 @@ export default function OrderDetail({ id }: { id?: number }) {
                             <CardTitle>Shipping Address</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-sm font-medium">{order.customerName}</p>
-                            <p className="text-sm text-muted-foreground">{order.shippingAddress}</p>
-                            <p className="mt-2 text-sm text-muted-foreground">{order.customerEmail}</p>
+                            <p className="text-sm font-medium">
+                                {order.customerName}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                                {order.shippingAddress}
+                            </p>
+                            <p className="mt-2 text-sm text-muted-foreground">
+                                {order.customerEmail}
+                            </p>
                         </CardContent>
                     </Card>
 
@@ -139,11 +191,19 @@ export default function OrderDetail({ id }: { id?: number }) {
                             <CardTitle>Payment Information</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-sm font-medium">Cash on Delivery</p>
-                            <p className="text-sm text-muted-foreground">Payment will be collected upon delivery</p>
+                            <p className="text-sm font-medium">
+                                Cash on Delivery
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                                Payment will be collected upon delivery
+                            </p>
                             <p className="mt-3 text-sm">
-                                <span className="text-muted-foreground">Amount: </span>
-                                <span className="font-semibold">{formatPrice(order.total)}</span>
+                                <span className="text-muted-foreground">
+                                    Amount:{' '}
+                                </span>
+                                <span className="font-semibold">
+                                    {formatPrice(order.total)}
+                                </span>
                             </p>
                         </CardContent>
                     </Card>

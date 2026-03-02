@@ -2,7 +2,6 @@ import { Link, usePage } from '@inertiajs/react';
 import {
     BarChart3,
     Box,
-    ChevronDown,
     LayoutDashboard,
     LogOut,
     Moon,
@@ -16,14 +15,10 @@ import {
     Users,
 } from 'lucide-react';
 import { useState } from 'react';
-import { useAppearance } from '@/hooks/use-appearance';
 import { Button } from '@/components/ui/button';
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from '@/components/ui/collapsible';
+
 import { Separator } from '@/components/ui/separator';
+import { useAppearance } from '@/hooks/use-appearance';
 import { cn } from '@/lib/utils';
 
 const adminNav = [
@@ -68,7 +63,7 @@ export default function AdminLayout({
             {/* Skip link */}
             <a
                 href="#admin-main"
-                className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
+                className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
             >
                 Skip to main content
             </a>
@@ -87,7 +82,9 @@ export default function AdminLayout({
                 className={cn(
                     'fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-card transition-all duration-300 lg:relative lg:z-0',
                     sidebarCollapsed ? 'w-16' : 'w-64',
-                    mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+                    mobileSidebarOpen
+                        ? 'translate-x-0'
+                        : '-translate-x-full lg:translate-x-0',
                 )}
                 role="navigation"
                 aria-label="Admin navigation"
@@ -115,7 +112,9 @@ export default function AdminLayout({
                                     : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
                             )}
                             title={sidebarCollapsed ? item.name : undefined}
-                            aria-current={isActive(item.href) ? 'page' : undefined}
+                            aria-current={
+                                isActive(item.href) ? 'page' : undefined
+                            }
                         >
                             <item.icon className="h-4 w-4 shrink-0" />
                             {!sidebarCollapsed && <span>{item.name}</span>}
@@ -154,7 +153,9 @@ export default function AdminLayout({
                             variant="ghost"
                             size="icon"
                             className="lg:hidden"
-                            onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+                            onClick={() =>
+                                setMobileSidebarOpen(!mobileSidebarOpen)
+                            }
                             aria-label="Toggle sidebar"
                         >
                             <BarChart3 className="h-5 w-5" />
@@ -165,13 +166,21 @@ export default function AdminLayout({
                             variant="ghost"
                             size="icon"
                             className="hidden lg:flex"
-                            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                            aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                            onClick={() =>
+                                setSidebarCollapsed(!sidebarCollapsed)
+                            }
+                            aria-label={
+                                sidebarCollapsed
+                                    ? 'Expand sidebar'
+                                    : 'Collapse sidebar'
+                            }
                         >
                             <BarChart3 className="h-5 w-5" />
                         </Button>
 
-                        {title && <h1 className="text-lg font-semibold">{title}</h1>}
+                        {title && (
+                            <h1 className="text-lg font-semibold">{title}</h1>
+                        )}
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -179,22 +188,36 @@ export default function AdminLayout({
                             variant="ghost"
                             size="icon"
                             onClick={toggleTheme}
-                            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                            aria-label={
+                                isDark
+                                    ? 'Switch to light mode'
+                                    : 'Switch to dark mode'
+                            }
                         >
-                            {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                            {isDark ? (
+                                <Sun className="h-5 w-5" />
+                            ) : (
+                                <Moon className="h-5 w-5" />
+                            )}
                         </Button>
                         <Separator orientation="vertical" className="h-6" />
                         <div className="flex items-center gap-2 text-sm">
                             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
                                 A
                             </div>
-                            <span className="hidden font-medium md:inline">Admin</span>
+                            <span className="hidden font-medium md:inline">
+                                Admin
+                            </span>
                         </div>
                     </div>
                 </header>
 
                 {/* Page content */}
-                <main id="admin-main" className="flex-1 overflow-y-auto p-4 lg:p-6" role="main">
+                <main
+                    id="admin-main"
+                    className="flex-1 overflow-y-auto p-4 lg:p-6"
+                    role="main"
+                >
                     {children}
                 </main>
             </div>

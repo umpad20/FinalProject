@@ -1,21 +1,25 @@
 import { Head, Link } from '@inertiajs/react';
-import { ChevronLeft, Heart, Minus, Plus, ShoppingBag, Star, Truck } from 'lucide-react';
+import { Heart, Minus, Plus, ShoppingBag, Star, Truck } from 'lucide-react';
 import { useState } from 'react';
 import ProductCard from '@/components/product-card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { formatPrice, mockProducts } from '@/lib/mock-data';
 import StoreLayout from '@/layouts/store-layout';
-import type { Product } from '@/types/store';
+import { formatPrice, mockProducts } from '@/lib/mock-data';
 
 export default function ProductDetail({ slug }: { slug?: string }) {
-    const product = mockProducts.find((p) => p.slug === slug) || mockProducts[0];
-    const relatedProducts = mockProducts.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4);
+    const product =
+        mockProducts.find((p) => p.slug === slug) || mockProducts[0];
+    const relatedProducts = mockProducts
+        .filter((p) => p.category === product.category && p.id !== product.id)
+        .slice(0, 4);
 
     const [selectedSize, setSelectedSize] = useState<string>('');
-    const [selectedColor, setSelectedColor] = useState<string>(product.colors[0]?.name || '');
+    const [selectedColor, setSelectedColor] = useState<string>(
+        product.colors[0]?.name || '',
+    );
     const [quantity, setQuantity] = useState(1);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [liked, setLiked] = useState(false);
@@ -24,7 +28,8 @@ export default function ProductDetail({ slug }: { slug?: string }) {
         (v) => v.size === selectedSize && v.color === selectedColor,
     );
 
-    const hasDiscount = product.compareAtPrice && product.compareAtPrice > product.price;
+    const hasDiscount =
+        product.compareAtPrice && product.compareAtPrice > product.price;
 
     return (
         <StoreLayout>
@@ -32,15 +37,38 @@ export default function ProductDetail({ slug }: { slug?: string }) {
 
             <div className="mx-auto max-w-7xl px-4 py-8">
                 {/* Breadcrumb */}
-                <nav className="mb-6 text-sm text-muted-foreground" aria-label="Breadcrumb">
+                <nav
+                    className="mb-6 text-sm text-muted-foreground"
+                    aria-label="Breadcrumb"
+                >
                     <ol className="flex items-center gap-2">
-                        <li><Link href="/" className="hover:text-foreground">Home</Link></li>
+                        <li>
+                            <Link href="/" className="hover:text-foreground">
+                                Home
+                            </Link>
+                        </li>
                         <li>/</li>
-                        <li><Link href="/shop" className="hover:text-foreground">Shop</Link></li>
+                        <li>
+                            <Link
+                                href="/shop"
+                                className="hover:text-foreground"
+                            >
+                                Shop
+                            </Link>
+                        </li>
                         <li>/</li>
-                        <li><Link href={`/shop?category=${product.category}`} className="hover:text-foreground">{product.category}</Link></li>
+                        <li>
+                            <Link
+                                href={`/shop?category=${product.category}`}
+                                className="hover:text-foreground"
+                            >
+                                {product.category}
+                            </Link>
+                        </li>
                         <li>/</li>
-                        <li className="font-medium text-foreground">{product.name}</li>
+                        <li className="font-medium text-foreground">
+                            {product.name}
+                        </li>
                     </ol>
                 </nav>
 
@@ -51,11 +79,17 @@ export default function ProductDetail({ slug }: { slug?: string }) {
                         <div className="relative aspect-[3/4] overflow-hidden rounded-xl bg-muted">
                             <img
                                 src={product.images[selectedImageIndex]?.url}
-                                alt={product.images[selectedImageIndex]?.alt || product.name}
+                                alt={
+                                    product.images[selectedImageIndex]?.alt ||
+                                    product.name
+                                }
                                 className="h-full w-full object-cover"
                             />
                             {hasDiscount && (
-                                <Badge variant="destructive" className="absolute top-4 left-4">
+                                <Badge
+                                    variant="destructive"
+                                    className="absolute top-4 left-4"
+                                >
                                     Sale
                                 </Badge>
                             )}
@@ -68,7 +102,9 @@ export default function ProductDetail({ slug }: { slug?: string }) {
                                     <button
                                         key={img.id}
                                         className={`relative aspect-square w-20 overflow-hidden rounded-lg border-2 transition-all ${
-                                            selectedImageIndex === i ? 'border-primary' : 'border-border hover:border-muted-foreground'
+                                            selectedImageIndex === i
+                                                ? 'border-primary'
+                                                : 'border-border hover:border-muted-foreground'
                                         }`}
                                         onClick={() => setSelectedImageIndex(i)}
                                         aria-label={`View image ${i + 1}`}
@@ -87,12 +123,19 @@ export default function ProductDetail({ slug }: { slug?: string }) {
                     {/* Product info */}
                     <div className="space-y-6">
                         <div>
-                            <p className="text-sm text-muted-foreground">{product.category}</p>
-                            <h1 className="mt-1 text-3xl font-bold">{product.name}</h1>
+                            <p className="text-sm text-muted-foreground">
+                                {product.category}
+                            </p>
+                            <h1 className="mt-1 text-3xl font-bold">
+                                {product.name}
+                            </h1>
 
                             {/* Rating */}
                             <div className="mt-2 flex items-center gap-2">
-                                <div className="flex gap-0.5" aria-label="Rating: 4.5 out of 5 stars">
+                                <div
+                                    className="flex gap-0.5"
+                                    aria-label="Rating: 4.5 out of 5 stars"
+                                >
                                     {Array.from({ length: 5 }).map((_, i) => (
                                         <Star
                                             key={i}
@@ -100,13 +143,17 @@ export default function ProductDetail({ slug }: { slug?: string }) {
                                         />
                                     ))}
                                 </div>
-                                <span className="text-sm text-muted-foreground">(24 reviews)</span>
+                                <span className="text-sm text-muted-foreground">
+                                    (24 reviews)
+                                </span>
                             </div>
                         </div>
 
                         {/* Price */}
                         <div className="flex items-baseline gap-3">
-                            <span className="text-3xl font-bold">{formatPrice(product.price)}</span>
+                            <span className="text-3xl font-bold">
+                                {formatPrice(product.price)}
+                            </span>
                             {hasDiscount && (
                                 <span className="text-lg text-muted-foreground line-through">
                                     {formatPrice(product.compareAtPrice!)}
@@ -119,25 +166,38 @@ export default function ProductDetail({ slug }: { slug?: string }) {
                         {/* Color selector */}
                         <div>
                             <Label className="text-sm font-semibold">
-                                Color: <span className="font-normal text-muted-foreground">{selectedColor}</span>
+                                Color:{' '}
+                                <span className="font-normal text-muted-foreground">
+                                    {selectedColor}
+                                </span>
                             </Label>
-                            <div className="mt-2 flex gap-3" role="radiogroup" aria-label="Select color">
+                            <div
+                                className="mt-2 flex gap-3"
+                                role="radiogroup"
+                                aria-label="Select color"
+                            >
                                 {product.colors.map((color) => (
                                     <button
                                         key={color.name}
                                         className={`flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all ${
                                             selectedColor === color.name
-                                                ? 'border-primary scale-110'
+                                                ? 'scale-110 border-primary'
                                                 : 'border-transparent hover:border-muted-foreground/30'
                                         }`}
-                                        onClick={() => setSelectedColor(color.name)}
+                                        onClick={() =>
+                                            setSelectedColor(color.name)
+                                        }
                                         role="radio"
-                                        aria-checked={selectedColor === color.name}
+                                        aria-checked={
+                                            selectedColor === color.name
+                                        }
                                         aria-label={color.name}
                                     >
                                         <span
                                             className="h-7 w-7 rounded-full border border-border"
-                                            style={{ backgroundColor: color.hex }}
+                                            style={{
+                                                backgroundColor: color.hex,
+                                            }}
                                         />
                                     </button>
                                 ))}
@@ -147,14 +207,25 @@ export default function ProductDetail({ slug }: { slug?: string }) {
                         {/* Size selector */}
                         <div>
                             <Label className="text-sm font-semibold">
-                                Size: <span className="font-normal text-muted-foreground">{selectedSize || 'Select a size'}</span>
+                                Size:{' '}
+                                <span className="font-normal text-muted-foreground">
+                                    {selectedSize || 'Select a size'}
+                                </span>
                             </Label>
-                            <div className="mt-2 flex flex-wrap gap-2" role="radiogroup" aria-label="Select size">
+                            <div
+                                className="mt-2 flex flex-wrap gap-2"
+                                role="radiogroup"
+                                aria-label="Select size"
+                            >
                                 {product.sizes.map((size) => {
                                     const variant = product.variants.find(
-                                        (v) => v.size === size && v.color === selectedColor,
+                                        (v) =>
+                                            v.size === size &&
+                                            v.color === selectedColor,
                                     );
-                                    const inStock = variant ? variant.stock > 0 : false;
+                                    const inStock = variant
+                                        ? variant.stock > 0
+                                        : false;
                                     return (
                                         <button
                                             key={size}
@@ -163,9 +234,11 @@ export default function ProductDetail({ slug }: { slug?: string }) {
                                                     ? 'border-primary bg-primary text-primary-foreground'
                                                     : inStock
                                                       ? 'border-border hover:border-primary'
-                                                      : 'cursor-not-allowed border-border opacity-40 line-through'
+                                                      : 'cursor-not-allowed border-border line-through opacity-40'
                                             }`}
-                                            onClick={() => inStock && setSelectedSize(size)}
+                                            onClick={() =>
+                                                inStock && setSelectedSize(size)
+                                            }
                                             disabled={!inStock}
                                             role="radio"
                                             aria-checked={selectedSize === size}
@@ -180,13 +253,17 @@ export default function ProductDetail({ slug }: { slug?: string }) {
 
                         {/* Quantity */}
                         <div>
-                            <Label className="text-sm font-semibold">Quantity</Label>
+                            <Label className="text-sm font-semibold">
+                                Quantity
+                            </Label>
                             <div className="mt-2 flex items-center gap-2">
                                 <Button
                                     variant="outline"
                                     size="icon"
                                     className="h-10 w-10"
-                                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                    onClick={() =>
+                                        setQuantity(Math.max(1, quantity - 1))
+                                    }
                                     disabled={quantity <= 1}
                                     aria-label="Decrease quantity"
                                 >
@@ -204,7 +281,11 @@ export default function ProductDetail({ slug }: { slug?: string }) {
                                     size="icon"
                                     className="h-10 w-10"
                                     onClick={() => setQuantity(quantity + 1)}
-                                    disabled={currentVariant ? quantity >= currentVariant.stock : false}
+                                    disabled={
+                                        currentVariant
+                                            ? quantity >= currentVariant.stock
+                                            : false
+                                    }
                                     aria-label="Increase quantity"
                                 >
                                     <Plus className="h-4 w-4" />
@@ -231,19 +312,29 @@ export default function ProductDetail({ slug }: { slug?: string }) {
                                 variant="outline"
                                 size="lg"
                                 onClick={() => setLiked(!liked)}
-                                aria-label={liked ? 'Remove from wishlist' : 'Add to wishlist'}
+                                aria-label={
+                                    liked
+                                        ? 'Remove from wishlist'
+                                        : 'Add to wishlist'
+                                }
                             >
-                                <Heart className={`h-5 w-5 ${liked ? 'fill-red-500 text-red-500' : ''}`} />
+                                <Heart
+                                    className={`h-5 w-5 ${liked ? 'fill-red-500 text-red-500' : ''}`}
+                                />
                             </Button>
                         </div>
 
                         {/* Delivery info */}
-                        <div className="rounded-lg border border-border p-4 space-y-3">
+                        <div className="space-y-3 rounded-lg border border-border p-4">
                             <div className="flex items-center gap-3">
                                 <Truck className="h-5 w-5 text-muted-foreground" />
                                 <div>
-                                    <p className="text-sm font-medium">Free Delivery</p>
-                                    <p className="text-xs text-muted-foreground">On orders over ₱2,000</p>
+                                    <p className="text-sm font-medium">
+                                        Free Delivery
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                        On orders over ₱2,000
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -254,43 +345,76 @@ export default function ProductDetail({ slug }: { slug?: string }) {
                 <div className="mt-16">
                     <Tabs defaultValue="description" className="w-full">
                         <TabsList className="w-full justify-start">
-                            <TabsTrigger value="description">Description</TabsTrigger>
+                            <TabsTrigger value="description">
+                                Description
+                            </TabsTrigger>
                             <TabsTrigger value="details">Details</TabsTrigger>
-                            <TabsTrigger value="reviews">Reviews (24)</TabsTrigger>
+                            <TabsTrigger value="reviews">
+                                Reviews (24)
+                            </TabsTrigger>
                         </TabsList>
                         <TabsContent value="description" className="mt-6">
-                            <div className="prose prose-sm max-w-none dark:prose-invert">
-                                <p className="text-muted-foreground leading-relaxed">{product.description}</p>
+                            <div className="prose prose-sm dark:prose-invert max-w-none">
+                                <p className="leading-relaxed text-muted-foreground">
+                                    {product.description}
+                                </p>
                             </div>
                         </TabsContent>
                         <TabsContent value="details" className="mt-6">
                             <div className="grid gap-4 sm:grid-cols-2">
                                 <div className="space-y-3">
                                     <div className="flex justify-between border-b border-border pb-2">
-                                        <span className="text-sm text-muted-foreground">Material</span>
-                                        <span className="text-sm font-medium">100% Organic Cotton</span>
+                                        <span className="text-sm text-muted-foreground">
+                                            Material
+                                        </span>
+                                        <span className="text-sm font-medium">
+                                            100% Organic Cotton
+                                        </span>
                                     </div>
                                     <div className="flex justify-between border-b border-border pb-2">
-                                        <span className="text-sm text-muted-foreground">Fit</span>
-                                        <span className="text-sm font-medium">Regular Fit</span>
+                                        <span className="text-sm text-muted-foreground">
+                                            Fit
+                                        </span>
+                                        <span className="text-sm font-medium">
+                                            Regular Fit
+                                        </span>
                                     </div>
                                     <div className="flex justify-between border-b border-border pb-2">
-                                        <span className="text-sm text-muted-foreground">Care</span>
-                                        <span className="text-sm font-medium">Machine Washable</span>
+                                        <span className="text-sm text-muted-foreground">
+                                            Care
+                                        </span>
+                                        <span className="text-sm font-medium">
+                                            Machine Washable
+                                        </span>
                                     </div>
                                 </div>
                                 <div className="space-y-3">
                                     <div className="flex justify-between border-b border-border pb-2">
-                                        <span className="text-sm text-muted-foreground">Available Sizes</span>
-                                        <span className="text-sm font-medium">{product.sizes.join(', ')}</span>
+                                        <span className="text-sm text-muted-foreground">
+                                            Available Sizes
+                                        </span>
+                                        <span className="text-sm font-medium">
+                                            {product.sizes.join(', ')}
+                                        </span>
                                     </div>
                                     <div className="flex justify-between border-b border-border pb-2">
-                                        <span className="text-sm text-muted-foreground">Colors</span>
-                                        <span className="text-sm font-medium">{product.colors.map((c) => c.name).join(', ')}</span>
+                                        <span className="text-sm text-muted-foreground">
+                                            Colors
+                                        </span>
+                                        <span className="text-sm font-medium">
+                                            {product.colors
+                                                .map((c) => c.name)
+                                                .join(', ')}
+                                        </span>
                                     </div>
                                     <div className="flex justify-between border-b border-border pb-2">
-                                        <span className="text-sm text-muted-foreground">SKU</span>
-                                        <span className="text-sm font-medium">{currentVariant?.sku || 'Select variant'}</span>
+                                        <span className="text-sm text-muted-foreground">
+                                            SKU
+                                        </span>
+                                        <span className="text-sm font-medium">
+                                            {currentVariant?.sku ||
+                                                'Select variant'}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -298,31 +422,57 @@ export default function ProductDetail({ slug }: { slug?: string }) {
                         <TabsContent value="reviews" className="mt-6">
                             <div className="space-y-6">
                                 {[
-                                    { name: 'Maria S.', date: '2026-01-15', rating: 5, text: 'Excellent quality! Fits perfectly and the material is so soft.' },
-                                    { name: 'Juan D.', date: '2026-01-10', rating: 4, text: 'Great product. Shipping was fast. Would buy again.' },
-                                    { name: 'Ana G.', date: '2025-12-28', rating: 5, text: 'Love it! The color is exactly as shown in the photos.' },
+                                    {
+                                        name: 'Maria S.',
+                                        date: '2026-01-15',
+                                        rating: 5,
+                                        text: 'Excellent quality! Fits perfectly and the material is so soft.',
+                                    },
+                                    {
+                                        name: 'Juan D.',
+                                        date: '2026-01-10',
+                                        rating: 4,
+                                        text: 'Great product. Shipping was fast. Would buy again.',
+                                    },
+                                    {
+                                        name: 'Ana G.',
+                                        date: '2025-12-28',
+                                        rating: 5,
+                                        text: 'Love it! The color is exactly as shown in the photos.',
+                                    },
                                 ].map((review, i) => (
-                                    <div key={i} className="border-b border-border pb-6 last:border-0">
+                                    <div
+                                        key={i}
+                                        className="border-b border-border pb-6 last:border-0"
+                                    >
                                         <div className="flex items-center justify-between">
                                             <div className="flex items-center gap-3">
                                                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-sm font-semibold">
                                                     {review.name.charAt(0)}
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-medium">{review.name}</p>
-                                                    <p className="text-xs text-muted-foreground">{review.date}</p>
+                                                    <p className="text-sm font-medium">
+                                                        {review.name}
+                                                    </p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {review.date}
+                                                    </p>
                                                 </div>
                                             </div>
                                             <div className="flex gap-0.5">
-                                                {Array.from({ length: 5 }).map((_, j) => (
-                                                    <Star
-                                                        key={j}
-                                                        className={`h-3 w-3 ${j < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground/30'}`}
-                                                    />
-                                                ))}
+                                                {Array.from({ length: 5 }).map(
+                                                    (_, j) => (
+                                                        <Star
+                                                            key={j}
+                                                            className={`h-3 w-3 ${j < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground/30'}`}
+                                                        />
+                                                    ),
+                                                )}
                                             </div>
                                         </div>
-                                        <p className="mt-3 text-sm text-muted-foreground">{review.text}</p>
+                                        <p className="mt-3 text-sm text-muted-foreground">
+                                            {review.text}
+                                        </p>
                                     </div>
                                 ))}
                             </div>
@@ -333,7 +483,9 @@ export default function ProductDetail({ slug }: { slug?: string }) {
                 {/* Related Products */}
                 {relatedProducts.length > 0 && (
                     <section className="mt-16" aria-label="Related products">
-                        <h2 className="mb-6 text-2xl font-bold">You May Also Like</h2>
+                        <h2 className="mb-6 text-2xl font-bold">
+                            You May Also Like
+                        </h2>
                         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                             {relatedProducts.map((p) => (
                                 <ProductCard key={p.id} product={p} />
@@ -346,6 +498,12 @@ export default function ProductDetail({ slug }: { slug?: string }) {
     );
 }
 
-function Label({ children, className }: { children: React.ReactNode; className?: string }) {
+function Label({
+    children,
+    className,
+}: {
+    children: React.ReactNode;
+    className?: string;
+}) {
     return <p className={className}>{children}</p>;
 }

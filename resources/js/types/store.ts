@@ -38,7 +38,12 @@ export type CartItem = {
     quantity: number;
 };
 
-export type OrderStatus = 'pending' | 'processing' | 'shipped' | 'completed' | 'cancelled';
+export type OrderStatus =
+    | 'pending'
+    | 'processing'
+    | 'shipped'
+    | 'completed'
+    | 'cancelled';
 
 export type OrderItem = {
     id: number;

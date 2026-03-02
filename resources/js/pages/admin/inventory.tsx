@@ -3,10 +3,23 @@ import { AlertTriangle, Package, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import AdminLayout from '@/layouts/admin-layout';
 
 interface Variant {
@@ -43,7 +56,11 @@ export default function AdminInventory({ products, stats }: Props) {
     const filteredVariants = allVariants.filter(({ product, variant }) => {
         if (searchQuery) {
             const q = searchQuery.toLowerCase();
-            if (!product.name.toLowerCase().includes(q) && !variant.sku.toLowerCase().includes(q)) return false;
+            if (
+                !product.name.toLowerCase().includes(q) &&
+                !variant.sku.toLowerCase().includes(q)
+            )
+                return false;
         }
         if (stockFilter === 'low' && variant.stock > 5) return false;
         if (stockFilter === 'out' && variant.stock > 0) return false;
@@ -61,7 +78,11 @@ export default function AdminInventory({ products, stats }: Props) {
     const handleSave = (variantId: number) => {
         const newStock = stockValues[variantId];
         if (newStock === undefined) return;
-        router.patch(`/admin/inventory/${variantId}`, { stock: newStock }, { preserveScroll: true });
+        router.patch(
+            `/admin/inventory/${variantId}`,
+            { stock: newStock },
+            { preserveScroll: true },
+        );
     };
 
     return (
@@ -70,7 +91,9 @@ export default function AdminInventory({ products, stats }: Props) {
 
             <div className="mb-6">
                 <h1 className="text-2xl font-bold">Inventory Management</h1>
-                <p className="text-sm text-muted-foreground">Manage stock across all product variants</p>
+                <p className="text-sm text-muted-foreground">
+                    Manage stock across all product variants
+                </p>
             </div>
 
             {/* Stats */}
@@ -81,8 +104,12 @@ export default function AdminInventory({ products, stats }: Props) {
                             <Package className="h-5 w-5" />
                         </div>
                         <div>
-                            <p className="text-sm text-muted-foreground">Total Stock</p>
-                            <p className="text-xl font-bold">{stats.totalStock} units</p>
+                            <p className="text-sm text-muted-foreground">
+                                Total Stock
+                            </p>
+                            <p className="text-xl font-bold">
+                                {stats.totalStock} units
+                            </p>
                         </div>
                     </CardContent>
                 </Card>
@@ -92,8 +119,12 @@ export default function AdminInventory({ products, stats }: Props) {
                             <AlertTriangle className="h-5 w-5" />
                         </div>
                         <div>
-                            <p className="text-sm text-muted-foreground">Low Stock</p>
-                            <p className="text-xl font-bold">{stats.lowStock} variants</p>
+                            <p className="text-sm text-muted-foreground">
+                                Low Stock
+                            </p>
+                            <p className="text-xl font-bold">
+                                {stats.lowStock} variants
+                            </p>
                         </div>
                     </CardContent>
                 </Card>
@@ -103,8 +134,12 @@ export default function AdminInventory({ products, stats }: Props) {
                             <Package className="h-5 w-5" />
                         </div>
                         <div>
-                            <p className="text-sm text-muted-foreground">Out of Stock</p>
-                            <p className="text-xl font-bold">{stats.outOfStock} variants</p>
+                            <p className="text-sm text-muted-foreground">
+                                Out of Stock
+                            </p>
+                            <p className="text-xl font-bold">
+                                {stats.outOfStock} variants
+                            </p>
                         </div>
                     </CardContent>
                 </Card>
@@ -114,7 +149,7 @@ export default function AdminInventory({ products, stats }: Props) {
             <Card className="mb-6">
                 <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
                     <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
                             placeholder="Search by product name or SKU..."
                             className="pl-10"
@@ -124,7 +159,10 @@ export default function AdminInventory({ products, stats }: Props) {
                         />
                     </div>
                     <Select value={stockFilter} onValueChange={setStockFilter}>
-                        <SelectTrigger className="w-[180px]" aria-label="Filter by stock level">
+                        <SelectTrigger
+                            className="w-[180px]"
+                            aria-label="Filter by stock level"
+                        >
                             <SelectValue placeholder="Stock level" />
                         </SelectTrigger>
                         <SelectContent>
@@ -145,18 +183,33 @@ export default function AdminInventory({ products, stats }: Props) {
                             <TableRow>
                                 <TableHead>Product</TableHead>
                                 <TableHead>SKU</TableHead>
-                                <TableHead className="text-center">Size</TableHead>
-                                <TableHead className="text-center">Color</TableHead>
-                                <TableHead className="text-center">Stock</TableHead>
-                                <TableHead className="text-center">Status</TableHead>
-                                <TableHead className="text-center">Update</TableHead>
+                                <TableHead className="text-center">
+                                    Size
+                                </TableHead>
+                                <TableHead className="text-center">
+                                    Color
+                                </TableHead>
+                                <TableHead className="text-center">
+                                    Stock
+                                </TableHead>
+                                <TableHead className="text-center">
+                                    Status
+                                </TableHead>
+                                <TableHead className="text-center">
+                                    Update
+                                </TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {filteredVariants.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={7} className="py-12 text-center text-muted-foreground">
-                                        {products.length === 0 ? 'No products yet. Add products first.' : 'No variants match your filters.'}
+                                    <TableCell
+                                        colSpan={7}
+                                        className="py-12 text-center text-muted-foreground"
+                                    >
+                                        {products.length === 0
+                                            ? 'No products yet. Add products first.'
+                                            : 'No variants match your filters.'}
                                     </TableCell>
                                 </TableRow>
                             ) : (
@@ -164,16 +217,36 @@ export default function AdminInventory({ products, stats }: Props) {
                                     <TableRow key={variant.id}>
                                         <TableCell>
                                             <div className="flex items-center gap-3">
-                                                {product.image && <img src={product.image} alt={product.name} className="h-8 w-8 rounded object-cover" />}
-                                                <span className="text-sm font-medium">{product.name}</span>
+                                                {product.image && (
+                                                    <img
+                                                        src={product.image}
+                                                        alt={product.name}
+                                                        className="h-8 w-8 rounded object-cover"
+                                                    />
+                                                )}
+                                                <span className="text-sm font-medium">
+                                                    {product.name}
+                                                </span>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="font-mono text-xs text-muted-foreground">{variant.sku}</TableCell>
-                                        <TableCell className="text-center">{variant.size}</TableCell>
+                                        <TableCell className="font-mono text-xs text-muted-foreground">
+                                            {variant.sku}
+                                        </TableCell>
+                                        <TableCell className="text-center">
+                                            {variant.size}
+                                        </TableCell>
                                         <TableCell className="text-center">
                                             <div className="flex items-center justify-center gap-2">
-                                                <span className="h-3 w-3 rounded-full border" style={{ backgroundColor: variant.colorHex }} />
-                                                <span className="text-sm">{variant.color}</span>
+                                                <span
+                                                    className="h-3 w-3 rounded-full border"
+                                                    style={{
+                                                        backgroundColor:
+                                                            variant.colorHex,
+                                                    }}
+                                                />
+                                                <span className="text-sm">
+                                                    {variant.color}
+                                                </span>
                                             </div>
                                         </TableCell>
                                         <TableCell className="text-center">
@@ -182,21 +255,43 @@ export default function AdminInventory({ products, stats }: Props) {
                                                 defaultValue={variant.stock}
                                                 className="mx-auto w-20 text-center"
                                                 min={0}
-                                                onChange={(e) => handleStockChange(variant.id, e.target.value)}
+                                                onChange={(e) =>
+                                                    handleStockChange(
+                                                        variant.id,
+                                                        e.target.value,
+                                                    )
+                                                }
                                                 aria-label={`Stock for ${product.name} ${variant.size} ${variant.color}`}
                                             />
                                         </TableCell>
                                         <TableCell className="text-center">
-                                            <Badge variant={variant.stock === 0 ? 'destructive' : variant.stock <= 5 ? 'secondary' : 'default'}>
-                                                {variant.stock === 0 ? 'Out' : variant.stock <= 5 ? 'Low' : 'In Stock'}
+                                            <Badge
+                                                variant={
+                                                    variant.stock === 0
+                                                        ? 'destructive'
+                                                        : variant.stock <= 5
+                                                          ? 'secondary'
+                                                          : 'default'
+                                                }
+                                            >
+                                                {variant.stock === 0
+                                                    ? 'Out'
+                                                    : variant.stock <= 5
+                                                      ? 'Low'
+                                                      : 'In Stock'}
                                             </Badge>
                                         </TableCell>
                                         <TableCell className="text-center">
                                             <Button
                                                 variant="outline"
                                                 size="sm"
-                                                onClick={() => handleSave(variant.id)}
-                                                disabled={stockValues[variant.id] === undefined}
+                                                onClick={() =>
+                                                    handleSave(variant.id)
+                                                }
+                                                disabled={
+                                                    stockValues[variant.id] ===
+                                                    undefined
+                                                }
                                             >
                                                 Save
                                             </Button>

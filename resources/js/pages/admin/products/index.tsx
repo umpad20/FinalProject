@@ -4,12 +4,30 @@ import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { formatPrice } from '@/lib/utils';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
 import AdminLayout from '@/layouts/admin-layout';
+import { formatPrice } from '@/lib/utils';
 
 interface ProductItem {
     id: number;
@@ -19,7 +37,14 @@ interface ProductItem {
     compareAtPrice: number | null;
     category: string;
     images: { id: number; url: string; alt: string | null }[];
-    variants: { id: number; size: string; color: string; colorHex: string; stock: number; sku: string }[];
+    variants: {
+        id: number;
+        size: string;
+        color: string;
+        colorHex: string;
+        stock: number;
+        sku: string;
+    }[];
     featured: boolean;
     status: string;
     createdAt: string;
@@ -35,8 +60,13 @@ export default function AdminProducts({ products, categories }: Props) {
     const [categoryFilter, setCategoryFilter] = useState('all');
 
     const filtered = products.filter((p) => {
-        if (categoryFilter !== 'all' && p.category !== categoryFilter) return false;
-        if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+        if (categoryFilter !== 'all' && p.category !== categoryFilter)
+            return false;
+        if (
+            searchQuery &&
+            !p.name.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+            return false;
         return true;
     });
 
@@ -53,7 +83,9 @@ export default function AdminProducts({ products, categories }: Props) {
             <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h1 className="text-2xl font-bold">Products</h1>
-                    <p className="text-sm text-muted-foreground">{products.length} total products</p>
+                    <p className="text-sm text-muted-foreground">
+                        {products.length} total products
+                    </p>
                 </div>
                 <Button asChild>
                     <Link href="/admin/products/create">
@@ -66,7 +98,7 @@ export default function AdminProducts({ products, categories }: Props) {
             <Card className="mb-6">
                 <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
                     <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
                             placeholder="Search products..."
                             className="pl-10"
@@ -75,14 +107,22 @@ export default function AdminProducts({ products, categories }: Props) {
                             aria-label="Search products"
                         />
                     </div>
-                    <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                        <SelectTrigger className="w-[180px]" aria-label="Filter by category">
+                    <Select
+                        value={categoryFilter}
+                        onValueChange={setCategoryFilter}
+                    >
+                        <SelectTrigger
+                            className="w-[180px]"
+                            aria-label="Filter by category"
+                        >
                             <SelectValue placeholder="Category" />
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">All Categories</SelectItem>
                             {categories.map((cat) => (
-                                <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+                                <SelectItem key={cat.id} value={cat.name}>
+                                    {cat.name}
+                                </SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
@@ -98,84 +138,170 @@ export default function AdminProducts({ products, categories }: Props) {
                                 <TableHead className="w-[50px]">#</TableHead>
                                 <TableHead>Product</TableHead>
                                 <TableHead>Category</TableHead>
-                                <TableHead className="text-right">Price</TableHead>
-                                <TableHead className="text-center">Variants</TableHead>
-                                <TableHead className="text-center">Total Stock</TableHead>
-                                <TableHead className="text-center">Status</TableHead>
+                                <TableHead className="text-right">
+                                    Price
+                                </TableHead>
+                                <TableHead className="text-center">
+                                    Variants
+                                </TableHead>
+                                <TableHead className="text-center">
+                                    Total Stock
+                                </TableHead>
+                                <TableHead className="text-center">
+                                    Status
+                                </TableHead>
                                 <TableHead className="w-[50px]"></TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {filtered.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={8} className="py-12 text-center text-muted-foreground">
-                                        {products.length === 0 ? 'No products yet. Click "Add Product" to create your first one!' : 'No products match your filters.'}
+                                    <TableCell
+                                        colSpan={8}
+                                        className="py-12 text-center text-muted-foreground"
+                                    >
+                                        {products.length === 0
+                                            ? 'No products yet. Click "Add Product" to create your first one!'
+                                            : 'No products match your filters.'}
                                     </TableCell>
                                 </TableRow>
                             ) : (
                                 filtered.map((product, i) => {
-                                    const totalStock = product.variants.reduce((s, v) => s + v.stock, 0);
+                                    const totalStock = product.variants.reduce(
+                                        (s, v) => s + v.stock,
+                                        0,
+                                    );
                                     return (
                                         <TableRow key={product.id}>
-                                            <TableCell className="text-muted-foreground">{i + 1}</TableCell>
+                                            <TableCell className="text-muted-foreground">
+                                                {i + 1}
+                                            </TableCell>
                                             <TableCell>
                                                 <div className="flex items-center gap-3">
                                                     <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md bg-muted">
-                                                        {product.images[0]?.url ? (
-                                                            <img src={product.images[0].url} alt={product.name} className="h-full w-full object-cover" />
+                                                        {product.images[0]
+                                                            ?.url ? (
+                                                            <img
+                                                                src={
+                                                                    product
+                                                                        .images[0]
+                                                                        .url
+                                                                }
+                                                                alt={
+                                                                    product.name
+                                                                }
+                                                                className="h-full w-full object-cover"
+                                                            />
                                                         ) : (
-                                                            <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">N/A</div>
+                                                            <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
+                                                                N/A
+                                                            </div>
                                                         )}
                                                     </div>
                                                     <div>
-                                                        <p className="text-sm font-medium">{product.name}</p>
-                                                        <p className="text-xs text-muted-foreground">{product.slug}</p>
+                                                        <p className="text-sm font-medium">
+                                                            {product.name}
+                                                        </p>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            {product.slug}
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </TableCell>
                                             <TableCell>
-                                                <Badge variant="secondary">{product.category}</Badge>
+                                                <Badge variant="secondary">
+                                                    {product.category}
+                                                </Badge>
                                             </TableCell>
                                             <TableCell className="text-right font-medium">
                                                 {formatPrice(product.price)}
                                                 {product.compareAtPrice && (
                                                     <span className="ml-1 text-xs text-muted-foreground line-through">
-                                                        {formatPrice(product.compareAtPrice)}
+                                                        {formatPrice(
+                                                            product.compareAtPrice,
+                                                        )}
                                                     </span>
                                                 )}
                                             </TableCell>
-                                            <TableCell className="text-center">{product.variants.length}</TableCell>
                                             <TableCell className="text-center">
-                                                <span className={totalStock <= 10 ? 'font-bold text-red-500' : ''}>
+                                                {product.variants.length}
+                                            </TableCell>
+                                            <TableCell className="text-center">
+                                                <span
+                                                    className={
+                                                        totalStock <= 10
+                                                            ? 'font-bold text-red-500'
+                                                            : ''
+                                                    }
+                                                >
                                                     {totalStock}
                                                 </span>
                                             </TableCell>
                                             <TableCell className="text-center">
-                                                <Badge variant={product.status === 'active' ? 'default' : product.status === 'draft' ? 'secondary' : 'destructive'}>
-                                                    {product.status.charAt(0).toUpperCase() + product.status.slice(1)}
+                                                <Badge
+                                                    variant={
+                                                        product.status ===
+                                                        'active'
+                                                            ? 'default'
+                                                            : product.status ===
+                                                                'draft'
+                                                              ? 'secondary'
+                                                              : 'destructive'
+                                                    }
+                                                >
+                                                    {product.status
+                                                        .charAt(0)
+                                                        .toUpperCase() +
+                                                        product.status.slice(1)}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>
                                                 <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                                                    <DropdownMenuTrigger
+                                                        asChild
+                                                    >
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-8 w-8"
+                                                        >
                                                             <MoreHorizontal className="h-4 w-4" />
-                                                            <span className="sr-only">Actions</span>
+                                                            <span className="sr-only">
+                                                                Actions
+                                                            </span>
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem asChild>
-                                                            <Link href={`/shop/${product.slug}`}>
-                                                                <Eye className="mr-2 h-4 w-4" /> View
+                                                        <DropdownMenuItem
+                                                            asChild
+                                                        >
+                                                            <Link
+                                                                href={`/shop/${product.slug}`}
+                                                            >
+                                                                <Eye className="mr-2 h-4 w-4" />{' '}
+                                                                View
                                                             </Link>
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem asChild>
-                                                            <Link href={`/admin/products/${product.id}/edit`}>
-                                                                <Edit className="mr-2 h-4 w-4" /> Edit
+                                                        <DropdownMenuItem
+                                                            asChild
+                                                        >
+                                                            <Link
+                                                                href={`/admin/products/${product.id}/edit`}
+                                                            >
+                                                                <Edit className="mr-2 h-4 w-4" />{' '}
+                                                                Edit
                                                             </Link>
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(product.id)}>
-                                                            <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                                        <DropdownMenuItem
+                                                            className="text-destructive"
+                                                            onClick={() =>
+                                                                handleDelete(
+                                                                    product.id,
+                                                                )
+                                                            }
+                                                        >
+                                                            <Trash2 className="mr-2 h-4 w-4" />{' '}
+                                                            Delete
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>

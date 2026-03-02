@@ -3,7 +3,13 @@ import { Plus, Save, Store, Trash2, X } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -27,8 +33,12 @@ export default function AdminSettings() {
     const [storeName, setStoreName] = useState('Jaypee Clothing Store');
     const [storeEmail, setStoreEmail] = useState('hello@jaypeeclothing.com');
     const [storePhone, setStorePhone] = useState('+63 912 345 6789');
-    const [storeAddress, setStoreAddress] = useState('123 Fashion Street, Makati City, Metro Manila, Philippines');
-    const [storeDescription, setStoreDescription] = useState('Premium Filipino clothing brand offering modern streetwear and casual fashion for everyone.');
+    const [storeAddress, setStoreAddress] = useState(
+        '123 Fashion Street, Makati City, Metro Manila, Philippines',
+    );
+    const [storeDescription, setStoreDescription] = useState(
+        'Premium Filipino clothing brand offering modern streetwear and casual fashion for everyone.',
+    );
     const [freeShippingThreshold, setFreeShippingThreshold] = useState('2000');
     const [enableNotifications, setEnableNotifications] = useState(true);
     const [enableReviews, setEnableReviews] = useState(true);
@@ -50,14 +60,24 @@ export default function AdminSettings() {
     const removeSize = (s: string) => setSizes(sizes.filter((sz) => sz !== s));
 
     const addColor = () => {
-        if (newColorName.trim() && !colors.find((c) => c.name.toLowerCase() === newColorName.trim().toLowerCase())) {
-            setColors([...colors, { name: newColorName.trim(), hex: newColorHex }]);
+        if (
+            newColorName.trim() &&
+            !colors.find(
+                (c) =>
+                    c.name.toLowerCase() === newColorName.trim().toLowerCase(),
+            )
+        ) {
+            setColors([
+                ...colors,
+                { name: newColorName.trim(), hex: newColorHex },
+            ]);
             setNewColorName('');
             setNewColorHex('#000000');
         }
     };
 
-    const removeColor = (name: string) => setColors(colors.filter((c) => c.name !== name));
+    const removeColor = (name: string) =>
+        setColors(colors.filter((c) => c.name !== name));
 
     return (
         <AdminLayout title="Settings">
@@ -66,7 +86,9 @@ export default function AdminSettings() {
             <div className="mb-6 flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold">Settings</h1>
-                    <p className="text-sm text-muted-foreground">Configure store preferences and product attributes</p>
+                    <p className="text-sm text-muted-foreground">
+                        Configure store preferences and product attributes
+                    </p>
                 </div>
                 <Button>
                     <Save className="mr-2 h-4 w-4" />
@@ -91,28 +113,72 @@ export default function AdminSettings() {
                                     <Store className="h-5 w-5" />
                                     Store Information
                                 </CardTitle>
-                                <CardDescription>Basic store details visible to customers</CardDescription>
+                                <CardDescription>
+                                    Basic store details visible to customers
+                                </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="storeName">Store Name</Label>
-                                    <Input id="storeName" value={storeName} onChange={(e) => setStoreName(e.target.value)} />
+                                    <Label htmlFor="storeName">
+                                        Store Name
+                                    </Label>
+                                    <Input
+                                        id="storeName"
+                                        value={storeName}
+                                        onChange={(e) =>
+                                            setStoreName(e.target.value)
+                                        }
+                                    />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="storeEmail">Contact Email</Label>
-                                    <Input id="storeEmail" type="email" value={storeEmail} onChange={(e) => setStoreEmail(e.target.value)} />
+                                    <Label htmlFor="storeEmail">
+                                        Contact Email
+                                    </Label>
+                                    <Input
+                                        id="storeEmail"
+                                        type="email"
+                                        value={storeEmail}
+                                        onChange={(e) =>
+                                            setStoreEmail(e.target.value)
+                                        }
+                                    />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="storePhone">Phone Number</Label>
-                                    <Input id="storePhone" value={storePhone} onChange={(e) => setStorePhone(e.target.value)} />
+                                    <Label htmlFor="storePhone">
+                                        Phone Number
+                                    </Label>
+                                    <Input
+                                        id="storePhone"
+                                        value={storePhone}
+                                        onChange={(e) =>
+                                            setStorePhone(e.target.value)
+                                        }
+                                    />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="storeAddress">Address</Label>
-                                    <Input id="storeAddress" value={storeAddress} onChange={(e) => setStoreAddress(e.target.value)} />
+                                    <Label htmlFor="storeAddress">
+                                        Address
+                                    </Label>
+                                    <Input
+                                        id="storeAddress"
+                                        value={storeAddress}
+                                        onChange={(e) =>
+                                            setStoreAddress(e.target.value)
+                                        }
+                                    />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="storeDesc">Description</Label>
-                                    <Textarea id="storeDesc" rows={3} value={storeDescription} onChange={(e) => setStoreDescription(e.target.value)} />
+                                    <Label htmlFor="storeDesc">
+                                        Description
+                                    </Label>
+                                    <Textarea
+                                        id="storeDesc"
+                                        rows={3}
+                                        value={storeDescription}
+                                        onChange={(e) =>
+                                            setStoreDescription(e.target.value)
+                                        }
+                                    />
                                 </div>
                             </CardContent>
                         </Card>
@@ -120,29 +186,55 @@ export default function AdminSettings() {
                         <Card>
                             <CardHeader>
                                 <CardTitle>Preferences</CardTitle>
-                                <CardDescription>Toggle store features</CardDescription>
+                                <CardDescription>
+                                    Toggle store features
+                                </CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-6">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <Label htmlFor="notifications">Order Notifications</Label>
-                                        <p className="text-xs text-muted-foreground">Receive email alerts for new orders</p>
+                                        <Label htmlFor="notifications">
+                                            Order Notifications
+                                        </Label>
+                                        <p className="text-xs text-muted-foreground">
+                                            Receive email alerts for new orders
+                                        </p>
                                     </div>
-                                    <Switch id="notifications" checked={enableNotifications} onCheckedChange={setEnableNotifications} />
+                                    <Switch
+                                        id="notifications"
+                                        checked={enableNotifications}
+                                        onCheckedChange={setEnableNotifications}
+                                    />
                                 </div>
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <Label htmlFor="reviews">Product Reviews</Label>
-                                        <p className="text-xs text-muted-foreground">Allow customers to leave reviews</p>
+                                        <Label htmlFor="reviews">
+                                            Product Reviews
+                                        </Label>
+                                        <p className="text-xs text-muted-foreground">
+                                            Allow customers to leave reviews
+                                        </p>
                                     </div>
-                                    <Switch id="reviews" checked={enableReviews} onCheckedChange={setEnableReviews} />
+                                    <Switch
+                                        id="reviews"
+                                        checked={enableReviews}
+                                        onCheckedChange={setEnableReviews}
+                                    />
                                 </div>
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <Label htmlFor="maintenance">Maintenance Mode</Label>
-                                        <p className="text-xs text-muted-foreground">Temporarily disable the storefront</p>
+                                        <Label htmlFor="maintenance">
+                                            Maintenance Mode
+                                        </Label>
+                                        <p className="text-xs text-muted-foreground">
+                                            Temporarily disable the storefront
+                                        </p>
                                     </div>
-                                    <Switch id="maintenance" checked={maintenanceMode} onCheckedChange={setMaintenanceMode} />
+                                    <Switch
+                                        id="maintenance"
+                                        checked={maintenanceMode}
+                                        onCheckedChange={setMaintenanceMode}
+                                    />
                                 </div>
                             </CardContent>
                         </Card>
@@ -154,12 +246,20 @@ export default function AdminSettings() {
                     <Card>
                         <CardHeader>
                             <CardTitle>Size Management</CardTitle>
-                            <CardDescription>Define available product sizes. These will appear as options when creating product variants.</CardDescription>
+                            <CardDescription>
+                                Define available product sizes. These will
+                                appear as options when creating product
+                                variants.
+                            </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="flex flex-wrap gap-2">
                                 {sizes.map((size) => (
-                                    <Badge key={size} variant="outline" className="flex items-center gap-1 px-3 py-1.5 text-sm">
+                                    <Badge
+                                        key={size}
+                                        variant="outline"
+                                        className="flex items-center gap-1 px-3 py-1.5 text-sm"
+                                    >
                                         {size}
                                         <button
                                             onClick={() => removeSize(size)}
@@ -176,7 +276,9 @@ export default function AdminSettings() {
                                     placeholder="New size (e.g. 3XL)"
                                     value={newSize}
                                     onChange={(e) => setNewSize(e.target.value)}
-                                    onKeyDown={(e) => e.key === 'Enter' && addSize()}
+                                    onKeyDown={(e) =>
+                                        e.key === 'Enter' && addSize()
+                                    }
                                     className="w-48"
                                     aria-label="New size name"
                                 />
@@ -194,19 +296,37 @@ export default function AdminSettings() {
                     <Card>
                         <CardHeader>
                             <CardTitle>Color Management</CardTitle>
-                            <CardDescription>Define available product colors with their hex values for visual display.</CardDescription>
+                            <CardDescription>
+                                Define available product colors with their hex
+                                values for visual display.
+                            </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                                 {colors.map((color) => (
-                                    <div key={color.name} className="flex items-center gap-3 rounded-lg border p-3">
-                                        <div className="h-8 w-8 rounded-full border" style={{ backgroundColor: color.hex }} aria-hidden="true" />
+                                    <div
+                                        key={color.name}
+                                        className="flex items-center gap-3 rounded-lg border p-3"
+                                    >
+                                        <div
+                                            className="h-8 w-8 rounded-full border"
+                                            style={{
+                                                backgroundColor: color.hex,
+                                            }}
+                                            aria-hidden="true"
+                                        />
                                         <div className="flex-1">
-                                            <p className="text-sm font-medium">{color.name}</p>
-                                            <p className="font-mono text-xs text-muted-foreground">{color.hex}</p>
+                                            <p className="text-sm font-medium">
+                                                {color.name}
+                                            </p>
+                                            <p className="font-mono text-xs text-muted-foreground">
+                                                {color.hex}
+                                            </p>
                                         </div>
                                         <button
-                                            onClick={() => removeColor(color.name)}
+                                            onClick={() =>
+                                                removeColor(color.name)
+                                            }
                                             className="rounded-full p-1 hover:bg-destructive hover:text-destructive-foreground"
                                             aria-label={`Remove color ${color.name}`}
                                         >
@@ -217,8 +337,18 @@ export default function AdminSettings() {
                             </div>
                             <div className="flex flex-wrap items-end gap-3">
                                 <div className="space-y-1.5">
-                                    <Label htmlFor="colorName">Color Name</Label>
-                                    <Input id="colorName" placeholder="e.g. Burgundy" value={newColorName} onChange={(e) => setNewColorName(e.target.value)} className="w-48" />
+                                    <Label htmlFor="colorName">
+                                        Color Name
+                                    </Label>
+                                    <Input
+                                        id="colorName"
+                                        placeholder="e.g. Burgundy"
+                                        value={newColorName}
+                                        onChange={(e) =>
+                                            setNewColorName(e.target.value)
+                                        }
+                                        className="w-48"
+                                    />
                                 </div>
                                 <div className="space-y-1.5">
                                     <Label htmlFor="colorHex">Hex Value</Label>
@@ -227,11 +357,19 @@ export default function AdminSettings() {
                                             id="colorHex"
                                             type="color"
                                             value={newColorHex}
-                                            onChange={(e) => setNewColorHex(e.target.value)}
+                                            onChange={(e) =>
+                                                setNewColorHex(e.target.value)
+                                            }
                                             className="h-9 w-9 cursor-pointer rounded border"
                                             aria-label="Pick color"
                                         />
-                                        <Input value={newColorHex} onChange={(e) => setNewColorHex(e.target.value)} className="w-28 font-mono" />
+                                        <Input
+                                            value={newColorHex}
+                                            onChange={(e) =>
+                                                setNewColorHex(e.target.value)
+                                            }
+                                            className="w-28 font-mono"
+                                        />
                                     </div>
                                 </div>
                                 <Button variant="outline" onClick={addColor}>
@@ -248,34 +386,68 @@ export default function AdminSettings() {
                     <Card>
                         <CardHeader>
                             <CardTitle>Shipping Settings</CardTitle>
-                            <CardDescription>Configure delivery options and thresholds</CardDescription>
+                            <CardDescription>
+                                Configure delivery options and thresholds
+                            </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="freeShipping">Free Shipping Threshold (₱)</Label>
+                                <Label htmlFor="freeShipping">
+                                    Free Shipping Threshold (₱)
+                                </Label>
                                 <Input
                                     id="freeShipping"
                                     type="number"
                                     value={freeShippingThreshold}
-                                    onChange={(e) => setFreeShippingThreshold(e.target.value)}
+                                    onChange={(e) =>
+                                        setFreeShippingThreshold(e.target.value)
+                                    }
                                     className="w-48"
                                 />
-                                <p className="text-xs text-muted-foreground">Orders above this amount qualify for free shipping. Set to 0 to disable.</p>
+                                <p className="text-xs text-muted-foreground">
+                                    Orders above this amount qualify for free
+                                    shipping. Set to 0 to disable.
+                                </p>
                             </div>
                             <div className="space-y-3">
                                 <Label>Delivery Areas</Label>
                                 {[
-                                    { area: 'Metro Manila', fee: '₱100', est: '1-2 days' },
-                                    { area: 'Luzon', fee: '₱150', est: '3-5 days' },
-                                    { area: 'Visayas', fee: '₱200', est: '5-7 days' },
-                                    { area: 'Mindanao', fee: '₱250', est: '5-7 days' },
+                                    {
+                                        area: 'Metro Manila',
+                                        fee: '₱100',
+                                        est: '1-2 days',
+                                    },
+                                    {
+                                        area: 'Luzon',
+                                        fee: '₱150',
+                                        est: '3-5 days',
+                                    },
+                                    {
+                                        area: 'Visayas',
+                                        fee: '₱200',
+                                        est: '5-7 days',
+                                    },
+                                    {
+                                        area: 'Mindanao',
+                                        fee: '₱250',
+                                        est: '5-7 days',
+                                    },
                                 ].map((zone) => (
-                                    <div key={zone.area} className="flex items-center justify-between rounded-lg border p-3">
+                                    <div
+                                        key={zone.area}
+                                        className="flex items-center justify-between rounded-lg border p-3"
+                                    >
                                         <div>
-                                            <p className="font-medium">{zone.area}</p>
-                                            <p className="text-xs text-muted-foreground">{zone.est}</p>
+                                            <p className="font-medium">
+                                                {zone.area}
+                                            </p>
+                                            <p className="text-xs text-muted-foreground">
+                                                {zone.est}
+                                            </p>
                                         </div>
-                                        <Badge variant="secondary">{zone.fee}</Badge>
+                                        <Badge variant="secondary">
+                                            {zone.fee}
+                                        </Badge>
                                     </div>
                                 ))}
                             </div>

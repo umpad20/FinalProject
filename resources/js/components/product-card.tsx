@@ -1,17 +1,22 @@
 import { Link } from '@inertiajs/react';
 import { Heart } from 'lucide-react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { formatPrice } from '@/lib/mock-data';
 import type { Product } from '@/types/store';
 
 export default function ProductCard({ product }: { product: Product }) {
     const [isHovered, setIsHovered] = useState(false);
     const [liked, setLiked] = useState(false);
-    const hasDiscount = product.compareAtPrice && product.compareAtPrice > product.price;
+    const hasDiscount =
+        product.compareAtPrice && product.compareAtPrice > product.price;
     const discountPercent = hasDiscount
-        ? Math.round(((product.compareAtPrice! - product.price) / product.compareAtPrice!) * 100)
+        ? Math.round(
+              ((product.compareAtPrice! - product.price) /
+                  product.compareAtPrice!) *
+                  100,
+          )
         : 0;
 
     return (
@@ -23,7 +28,10 @@ export default function ProductCard({ product }: { product: Product }) {
             aria-label={product.name}
         >
             {/* Image */}
-            <Link href={`/shop/${product.slug}`} className="relative aspect-[3/4] overflow-hidden bg-muted">
+            <Link
+                href={`/shop/${product.slug}`}
+                className="relative aspect-[3/4] overflow-hidden bg-muted"
+            >
                 <img
                     src={product.images[0]?.url}
                     alt={product.images[0]?.alt || product.name}
@@ -52,9 +60,13 @@ export default function ProductCard({ product }: { product: Product }) {
                         e.preventDefault();
                         setLiked(!liked);
                     }}
-                    aria-label={liked ? 'Remove from wishlist' : 'Add to wishlist'}
+                    aria-label={
+                        liked ? 'Remove from wishlist' : 'Add to wishlist'
+                    }
                 >
-                    <Heart className={`h-4 w-4 ${liked ? 'fill-red-500 text-red-500' : ''}`} />
+                    <Heart
+                        className={`h-4 w-4 ${liked ? 'fill-red-500 text-red-500' : ''}`}
+                    />
                 </Button>
 
                 {/* Quick add overlay */}
@@ -75,15 +87,20 @@ export default function ProductCard({ product }: { product: Product }) {
 
             {/* Info */}
             <div className="flex flex-1 flex-col p-3">
-                <p className="text-xs text-muted-foreground">{product.category}</p>
+                <p className="text-xs text-muted-foreground">
+                    {product.category}
+                </p>
                 <Link href={`/shop/${product.slug}`}>
-                    <h3 className="mt-1 text-sm font-medium leading-tight hover:underline">
+                    <h3 className="mt-1 text-sm leading-tight font-medium hover:underline">
                         {product.name}
                     </h3>
                 </Link>
 
                 {/* Colors */}
-                <div className="mt-2 flex items-center gap-1" aria-label="Available colors">
+                <div
+                    className="mt-2 flex items-center gap-1"
+                    aria-label="Available colors"
+                >
                     {product.colors.map((color) => (
                         <span
                             key={color.name}
@@ -98,7 +115,9 @@ export default function ProductCard({ product }: { product: Product }) {
 
                 {/* Price */}
                 <div className="mt-2 flex items-center gap-2">
-                    <span className="text-sm font-semibold">{formatPrice(product.price)}</span>
+                    <span className="text-sm font-semibold">
+                        {formatPrice(product.price)}
+                    </span>
                     {hasDiscount && (
                         <span className="text-xs text-muted-foreground line-through">
                             {formatPrice(product.compareAtPrice!)}
