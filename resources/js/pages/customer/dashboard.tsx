@@ -1,9 +1,8 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import {
     Package,
     ShoppingBag,
     CreditCard,
-    Heart,
     ArrowRight,
     Clock,
 } from 'lucide-react';
@@ -11,7 +10,17 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import StoreLayout from '@/layouts/store-layout';
-import { formatPrice, mockOrders } from '@/lib/mock-data';
+import { formatPrice } from '@/lib/utils';
+import type { Order } from '@/types/store';
+
+type DashboardProps = {
+    stats: {
+        totalOrders: number;
+        pendingOrders: number;
+        totalSpent: number;
+    };
+    recentOrders: Order[];
+};
 
 const statusColors: Record<string, string> = {
     pending:
@@ -24,8 +33,8 @@ const statusColors: Record<string, string> = {
     cancelled: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
 };
 
-export default function CustomerDashboard() {
-    const recentOrders = mockOrders.slice(0, 3);
+export default function CustomerDashboard({ stats, recentOrders }: DashboardProps) {
+    const { auth } = usePage().props;
 
     return (
         <StoreLayout>
@@ -34,7 +43,7 @@ export default function CustomerDashboard() {
             <div className="mx-auto max-w-7xl px-4 py-8">
                 {/* Welcome */}
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold">Welcome back, Juan!</h1>
+                    <h1 className="text-3xl font-bold">Welcome back, {auth.user.name.split(' ')[0]}!</h1>
                     <p className="mt-1 text-muted-foreground">
                         Here&apos;s an overview of your account.
                     </p>
@@ -46,25 +55,25 @@ export default function CustomerDashboard() {
                         {
                             icon: Package,
                             label: 'Total Orders',
-                            value: '4',
+                            value: String(stats.totalOrders),
                             color: 'text-blue-600 dark:text-blue-400',
                         },
                         {
                             icon: Clock,
                             label: 'Pending',
-                            value: '1',
+                            value: String(stats.pendingOrders),
                             color: 'text-yellow-600 dark:text-yellow-400',
                         },
                         {
                             icon: CreditCard,
                             label: 'Total Spent',
-                            value: formatPrice(624.9),
+                            value: formatPrice(stats.totalSpent),
                             color: 'text-green-600 dark:text-green-400',
                         },
                         {
-                            icon: Heart,
-                            label: 'Wishlist Items',
-                            value: '7',
+                            icon: ShoppingBag,
+                            label: 'Recent Orders',
+                            value: String(recentOrders.length),
                             color: 'text-red-600 dark:text-red-400',
                         },
                     ].map((stat) => (
@@ -136,7 +145,7 @@ export default function CustomerDashboard() {
                                                             ? 's'
                                                             : ''}{' '}
                                                         &middot;{' '}
-                                                        {order.createdAt}
+                                                        {new Date(order.createdAt).toLocaleDateString()}
                                                     </p>
                                                 </div>
                                             </div>
@@ -213,7 +222,7 @@ export default function CustomerDashboard() {
                                         Name
                                     </p>
                                     <p className="text-sm font-medium">
-                                        Juan Dela Cruz
+                                        {auth.user.name}
                                     </p>
                                 </div>
                                 <div>
@@ -221,7 +230,7 @@ export default function CustomerDashboard() {
                                         Email
                                     </p>
                                     <p className="text-sm font-medium">
-                                        juan@example.com
+                                        {auth.user.email}
                                     </p>
                                 </div>
                                 <div>
@@ -229,7 +238,7 @@ export default function CustomerDashboard() {
                                         Member since
                                     </p>
                                     <p className="text-sm font-medium">
-                                        January 2026
+                                        {new Date(auth.user.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
                                     </p>
                                 </div>
                                 <Button

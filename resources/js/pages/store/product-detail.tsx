@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Heart, Minus, Plus, ShoppingBag, Star, Truck } from 'lucide-react';
 import { useState } from 'react';
 import ProductCard from '@/components/product-card';
@@ -7,14 +7,15 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import StoreLayout from '@/layouts/store-layout';
-import { formatPrice, mockProducts } from '@/lib/mock-data';
+import { formatPrice } from '@/lib/utils';
+import type { Product } from '@/types/store';
 
-export default function ProductDetail({ slug }: { slug?: string }) {
-    const product =
-        mockProducts.find((p) => p.slug === slug) || mockProducts[0];
-    const relatedProducts = mockProducts
-        .filter((p) => p.category === product.category && p.id !== product.id)
-        .slice(0, 4);
+type ProductDetailProps = {
+    product: Product;
+    relatedProducts: Product[];
+};
+
+export default function ProductDetail({ product, relatedProducts }: ProductDetailProps) {
 
     const [selectedSize, setSelectedSize] = useState<string>('');
     const [selectedColor, setSelectedColor] = useState<string>(
@@ -23,6 +24,7 @@ export default function ProductDetail({ slug }: { slug?: string }) {
     const [quantity, setQuantity] = useState(1);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [liked, setLiked] = useState(false);
+    const [addingToCart, setAddingToCart] = useState(false);
 
     const currentVariant = product.variants.find(
         (v) => v.size === selectedSize && v.color === selectedColor,
@@ -303,10 +305,22 @@ export default function ProductDetail({ slug }: { slug?: string }) {
                             <Button
                                 size="lg"
                                 className="flex-1"
-                                disabled={!selectedSize}
+                                disabled={!selectedSize || !currentVariant || addingToCart}
+                                onClick={() => {
+                                    if (!currentVariant) return;
+                                    setAddingToCart(true);
+                                    router.post('/cart', {
+                                        product_id: product.id,
+                                        variant_id: currentVariant.id,
+                                        quantity: quantity,
+                                    }, {
+                                        preserveScroll: true,
+                                        onFinish: () => setAddingToCart(false),
+                                    });
+                                }}
                             >
                                 <ShoppingBag className="mr-2 h-5 w-5" />
-                                {selectedSize ? 'Add to Cart' : 'Select a Size'}
+                                {addingToCart ? 'Adding...' : selectedSize ? 'Add to Cart' : 'Select a Size'}
                             </Button>
                             <Button
                                 variant="outline"

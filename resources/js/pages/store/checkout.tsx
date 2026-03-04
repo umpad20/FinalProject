@@ -1,6 +1,5 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, Lock, ShieldCheck } from 'lucide-react';
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,18 +8,59 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import StoreLayout from '@/layouts/store-layout';
-import { formatPrice, mockCartItems } from '@/lib/mock-data';
+import { formatPrice } from '@/lib/utils';
 
-export default function Checkout() {
-    const items = mockCartItems;
-    const [paymentMethod, setPaymentMethod] = useState('cod');
+type CheckoutProduct = {
+    id: number;
+    name: string;
+    price: number;
+    images: { id: number; url: string; alt: string }[];
+};
+
+type CheckoutVariant = {
+    id: number;
+    size: string;
+    color: string;
+};
+
+type CheckoutCartItem = {
+    id: number;
+    product: CheckoutProduct;
+    variant: CheckoutVariant;
+    quantity: number;
+};
+
+type CheckoutProps = {
+    cartItems: CheckoutCartItem[];
+};
+
+export default function Checkout({ cartItems }: CheckoutProps) {
+    const items = cartItems;
+
+    const { data, setData, post, processing, errors } = useForm({
+        first_name: '',
+        last_name: '',
+        email: '',
+        phone: '',
+        address: '',
+        city: '',
+        province: '',
+        zip: '',
+        payment_method: 'cod',
+        notes: '',
+    });
 
     const subtotal = items.reduce(
         (sum, item) => sum + item.product.price * item.quantity,
         0,
     );
-    const shipping = subtotal >= 2000 ? 0 : 150;
+    const shipping = subtotal >= 2000 ? 0 : 100;
     const total = subtotal + shipping;
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        post('/checkout');
+    };
 
     return (
         <StoreLayout>
@@ -37,7 +77,7 @@ export default function Checkout() {
 
                 <h1 className="mb-8 text-3xl font-bold">Checkout</h1>
 
-                <div className="grid gap-8 lg:grid-cols-3">
+                <form onSubmit={handleSubmit} className="grid gap-8 lg:grid-cols-3">
                     {/* Checkout form */}
                     <div className="space-y-6 lg:col-span-2">
                         {/* Contact Info */}
@@ -57,7 +97,10 @@ export default function Checkout() {
                                             id="firstName"
                                             placeholder="Juan"
                                             className="mt-1"
+                                            value={data.first_name}
+                                            onChange={(e) => setData('first_name', e.target.value)}
                                         />
+                                        {errors.first_name && <p className="mt-1 text-xs text-destructive">{errors.first_name}</p>}
                                     </div>
                                     <div>
                                         <Label htmlFor="lastName">
@@ -67,7 +110,10 @@ export default function Checkout() {
                                             id="lastName"
                                             placeholder="Dela Cruz"
                                             className="mt-1"
+                                            value={data.last_name}
+                                            onChange={(e) => setData('last_name', e.target.value)}
                                         />
+                                        {errors.last_name && <p className="mt-1 text-xs text-destructive">{errors.last_name}</p>}
                                     </div>
                                 </div>
                                 <div>
@@ -77,7 +123,10 @@ export default function Checkout() {
                                         type="email"
                                         placeholder="juan@example.com"
                                         className="mt-1"
+                                        value={data.email}
+                                        onChange={(e) => setData('email', e.target.value)}
                                     />
+                                    {errors.email && <p className="mt-1 text-xs text-destructive">{errors.email}</p>}
                                 </div>
                                 <div>
                                     <Label htmlFor="phone">Phone number</Label>
@@ -86,7 +135,10 @@ export default function Checkout() {
                                         type="tel"
                                         placeholder="+63 912 345 6789"
                                         className="mt-1"
+                                        value={data.phone}
+                                        onChange={(e) => setData('phone', e.target.value)}
                                     />
+                                    {errors.phone && <p className="mt-1 text-xs text-destructive">{errors.phone}</p>}
                                 </div>
                             </CardContent>
                         </Card>
@@ -107,7 +159,10 @@ export default function Checkout() {
                                         id="address"
                                         placeholder="123 Main St"
                                         className="mt-1"
+                                        value={data.address}
+                                        onChange={(e) => setData('address', e.target.value)}
                                     />
+                                    {errors.address && <p className="mt-1 text-xs text-destructive">{errors.address}</p>}
                                 </div>
                                 <div className="grid gap-4 sm:grid-cols-2">
                                     <div>
@@ -116,7 +171,10 @@ export default function Checkout() {
                                             id="city"
                                             placeholder="Manila"
                                             className="mt-1"
+                                            value={data.city}
+                                            onChange={(e) => setData('city', e.target.value)}
                                         />
+                                        {errors.city && <p className="mt-1 text-xs text-destructive">{errors.city}</p>}
                                     </div>
                                     <div>
                                         <Label htmlFor="province">
@@ -126,7 +184,10 @@ export default function Checkout() {
                                             id="province"
                                             placeholder="Metro Manila"
                                             className="mt-1"
+                                            value={data.province}
+                                            onChange={(e) => setData('province', e.target.value)}
                                         />
+                                        {errors.province && <p className="mt-1 text-xs text-destructive">{errors.province}</p>}
                                     </div>
                                 </div>
                                 <div className="grid gap-4 sm:grid-cols-2">
@@ -138,7 +199,10 @@ export default function Checkout() {
                                             id="postalCode"
                                             placeholder="1000"
                                             className="mt-1"
+                                            value={data.zip}
+                                            onChange={(e) => setData('zip', e.target.value)}
                                         />
+                                        {errors.zip && <p className="mt-1 text-xs text-destructive">{errors.zip}</p>}
                                     </div>
                                     <div>
                                         <Label htmlFor="country">Country</Label>
@@ -159,6 +223,8 @@ export default function Checkout() {
                                         placeholder="Any special instructions..."
                                         className="mt-1"
                                         rows={3}
+                                        value={data.notes}
+                                        onChange={(e) => setData('notes', e.target.value)}
                                     />
                                 </div>
                             </CardContent>
@@ -173,12 +239,12 @@ export default function Checkout() {
                             </CardHeader>
                             <CardContent>
                                 <RadioGroup
-                                    value={paymentMethod}
-                                    onValueChange={setPaymentMethod}
+                                    value={data.payment_method}
+                                    onValueChange={(v) => setData('payment_method', v)}
                                     className="space-y-3"
                                 >
                                     <div
-                                        className={`flex items-center gap-3 rounded-lg border p-4 transition-colors ${paymentMethod === 'cod' ? 'border-primary bg-primary/5' : 'border-border'}`}
+                                        className={`flex items-center gap-3 rounded-lg border p-4 transition-colors ${data.payment_method === 'cod' ? 'border-primary bg-primary/5' : 'border-border'}`}
                                     >
                                         <RadioGroupItem value="cod" id="cod" />
                                         <Label
@@ -194,7 +260,7 @@ export default function Checkout() {
                                         </Label>
                                     </div>
                                     <div
-                                        className={`flex items-center gap-3 rounded-lg border p-4 transition-colors ${paymentMethod === 'gcash' ? 'border-primary bg-primary/5' : 'border-border'}`}
+                                        className={`flex items-center gap-3 rounded-lg border p-4 transition-colors ${data.payment_method === 'gcash' ? 'border-primary bg-primary/5' : 'border-border'}`}
                                     >
                                         <RadioGroupItem
                                             value="gcash"
@@ -213,7 +279,7 @@ export default function Checkout() {
                                         </Label>
                                     </div>
                                     <div
-                                        className={`flex items-center gap-3 rounded-lg border p-4 transition-colors ${paymentMethod === 'card' ? 'border-primary bg-primary/5' : 'border-border'}`}
+                                        className={`flex items-center gap-3 rounded-lg border p-4 transition-colors ${data.payment_method === 'card' ? 'border-primary bg-primary/5' : 'border-border'}`}
                                     >
                                         <RadioGroupItem
                                             value="card"
@@ -233,7 +299,7 @@ export default function Checkout() {
                                     </div>
                                 </RadioGroup>
 
-                                {paymentMethod === 'card' && (
+                                {data.payment_method === 'card' && (
                                     <div className="mt-4 space-y-4 rounded-lg border border-border bg-muted/50 p-4">
                                         <div>
                                             <Label htmlFor="cardNumber">
@@ -340,9 +406,9 @@ export default function Checkout() {
                                 <span>{formatPrice(total)}</span>
                             </div>
 
-                            <Button className="mt-6 w-full" size="lg">
+                            <Button className="mt-6 w-full" size="lg" type="submit" disabled={processing}>
                                 <Lock className="mr-2 h-4 w-4" />
-                                Place Order
+                                {processing ? 'Placing Order...' : 'Place Order'}
                             </Button>
 
                             <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted-foreground">
@@ -353,7 +419,7 @@ export default function Checkout() {
                             </div>
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
         </StoreLayout>
     );

@@ -13,7 +13,18 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $totalRevenue = Order::where('status', '!=', 'cancelled')->sum('total');
+        // Revenue: e-cash (gcash/card) counts immediately (non-cancelled);
+        // COD only counts when delivery is marked 'delivered'
+        $ecashRevenue = Order::where('status', '!=', 'cancelled')
+            ->whereIn('payment_method', ['gcash', 'card'])
+            ->sum('total');
+
+        $codRevenue = Order::where('status', '!=', 'cancelled')
+            ->where('payment_method', 'cod')
+            ->whereHas('delivery', fn ($q) => $q->where('status', 'delivered'))
+            ->sum('total');
+
+        $totalRevenue = $ecashRevenue + $codRevenue;
         $totalOrders = Order::count();
         $totalProducts = Product::count();
         $totalCustomers = User::where('is_admin', false)->count();

@@ -144,7 +144,7 @@ export default function AdminLayout({
             </aside>
 
             {/* Main area */}
-            <div className="flex flex-1 flex-col overflow-hidden">
+            <div className="flex flex-1 flex-col min-w-0">
                 {/* Top bar */}
                 <header className="flex h-16 items-center justify-between border-b border-border bg-card px-4 lg:px-6">
                     <div className="flex items-center gap-4">

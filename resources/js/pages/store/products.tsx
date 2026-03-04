@@ -29,7 +29,19 @@ import {
     SheetTrigger,
 } from '@/components/ui/sheet';
 import StoreLayout from '@/layouts/store-layout';
-import { mockCategories, mockProducts } from '@/lib/mock-data';
+import type { Product } from '@/types/store';
+
+type ShopCategory = {
+    id: number;
+    name: string;
+    slug: string;
+};
+
+type ShopProps = {
+    products: Product[];
+    categories: ShopCategory[];
+    category?: string;
+};
 
 const allSizes = ['XS', 'S', 'M', 'L', 'XL'];
 const allColors = [
@@ -45,7 +57,7 @@ const allColors = [
 
 type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'name-asc';
 
-export default function Shop({ category }: { category?: string }) {
+export default function Shop({ products: allProducts, categories, category }: ShopProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string>(
         category || '',
@@ -85,7 +97,7 @@ export default function Shop({ category }: { category?: string }) {
         selectedColors.length > 0;
 
     const filteredProducts = useMemo(() => {
-        let products = [...mockProducts];
+        let products = [...allProducts];
 
         // Search
         if (searchQuery) {
@@ -139,7 +151,7 @@ export default function Shop({ category }: { category?: string }) {
         }
 
         return products;
-    }, [searchQuery, selectedCategory, selectedSizes, selectedColors, sortBy]);
+    }, [allProducts, searchQuery, selectedCategory, selectedSizes, selectedColors, sortBy]);
 
     const filtersContent = (
         <div className="space-y-6">
@@ -175,16 +187,13 @@ export default function Shop({ category }: { category?: string }) {
                     >
                         All Categories
                     </button>
-                    {mockCategories.map((cat) => (
+                    {categories.map((cat) => (
                         <button
                             key={cat.id}
                             className={`flex w-full items-center justify-between rounded-md px-2 py-1 text-left text-sm transition-colors ${selectedCategory === cat.name ? 'bg-accent font-medium text-accent-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                             onClick={() => setSelectedCategory(cat.name)}
                         >
                             <span>{cat.name}</span>
-                            <span className="text-xs text-muted-foreground">
-                                {cat.productCount}
-                            </span>
                         </button>
                     ))}
                 </div>

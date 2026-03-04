@@ -8,7 +8,12 @@ import { Input } from '@/components/ui/input';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import StoreLayout from '@/layouts/store-layout';
-import { formatPrice, mockOrders } from '@/lib/mock-data';
+import { formatPrice } from '@/lib/utils';
+import type { Order } from '@/types/store';
+
+type OrdersProps = {
+    orders: Order[];
+};
 
 const statusColors: Record<string, string> = {
     pending:
@@ -21,11 +26,11 @@ const statusColors: Record<string, string> = {
     cancelled: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
 };
 
-export default function CustomerOrders() {
+export default function CustomerOrders({ orders }: OrdersProps) {
     const [activeTab, setActiveTab] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
 
-    const filteredOrders = mockOrders.filter((order) => {
+    const filteredOrders = orders.filter((order) => {
         if (activeTab !== 'all' && order.status !== activeTab) return false;
         if (
             searchQuery &&
@@ -121,7 +126,7 @@ export default function CustomerOrders() {
                                                         </p>
                                                         <p className="text-xs text-muted-foreground">
                                                             Placed on{' '}
-                                                            {order.createdAt}
+                                                            {new Date(order.createdAt).toLocaleDateString()}
                                                         </p>
                                                     </div>
                                                 </div>

@@ -41,6 +41,19 @@ class DeliveryController extends Controller
             'tracking_number' => $request->tracking_number ?? $delivery->tracking_number,
         ]);
 
+        // Keep the order status in sync with the delivery status
+        $orderStatus = match ($request->status) {
+            'preparing' => 'processing',
+            'in-transit' => 'shipped',
+            'delivered' => 'completed',
+            'returned' => 'cancelled',
+            default => null,
+        };
+
+        if ($orderStatus) {
+            $delivery->order->update(['status' => $orderStatus]);
+        }
+
         return back()->with('success', 'Delivery status updated.');
     }
 }

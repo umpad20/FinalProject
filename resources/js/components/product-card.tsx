@@ -3,7 +3,7 @@ import { Heart } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { formatPrice } from '@/lib/mock-data';
+import { formatPrice } from '@/lib/utils';
 import type { Product } from '@/types/store';
 
 export default function ProductCard({ product }: { product: Product }) {

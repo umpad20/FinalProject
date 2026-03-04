@@ -1,35 +1,58 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Minus, Plus, ShoppingBag, Trash2, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import StoreLayout from '@/layouts/store-layout';
-import { formatPrice, mockCartItems } from '@/lib/mock-data';
-import type { CartItem } from '@/types/store';
+import { formatPrice } from '@/lib/utils';
 
-export default function Cart() {
-    const [items, setItems] = useState<CartItem[]>(mockCartItems);
+type CartProduct = {
+    id: number;
+    name: string;
+    slug: string;
+    price: number;
+    images: { id: number; url: string; alt: string }[];
+};
+
+type CartVariant = {
+    id: number;
+    size: string;
+    color: string;
+    colorHex: string;
+    stock: number;
+    sku: string;
+};
+
+type CartItemType = {
+    id: number;
+    product: CartProduct;
+    variant: CartVariant;
+    quantity: number;
+};
+
+type CartProps = {
+    cartItems: CartItemType[];
+};
+
+export default function Cart({ cartItems }: CartProps) {
+    const items = cartItems;
     const [promoCode, setPromoCode] = useState('');
 
     const updateQuantity = (id: number, newQty: number) => {
         if (newQty < 1) return;
-        setItems((prev) =>
-            prev.map((item) =>
-                item.id === id ? { ...item, quantity: newQty } : item,
-            ),
-        );
+        router.patch(`/cart/${id}`, { quantity: newQty }, { preserveScroll: true });
     };
 
     const removeItem = (id: number) => {
-        setItems((prev) => prev.filter((item) => item.id !== id));
+        router.delete(`/cart/${id}`, { preserveScroll: true });
     };
 
     const subtotal = items.reduce(
         (sum, item) => sum + item.product.price * item.quantity,
         0,
     );
-    const shipping = subtotal >= 2000 ? 0 : 150;
+    const shipping = subtotal >= 2000 ? 0 : 100;
     const total = subtotal + shipping;
 
     return (

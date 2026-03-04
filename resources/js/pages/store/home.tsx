@@ -11,9 +11,13 @@ import ProductCard from '@/components/product-card';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import StoreLayout from '@/layouts/store-layout';
-import { mockCategories, mockProducts } from '@/lib/mock-data';
+import type { Product, Category } from '@/types/store';
 
-const featuredProducts = mockProducts.filter((p) => p.featured);
+type HomeProps = {
+    categories: Category[];
+    featuredProducts: Product[];
+    newArrivals: Product[];
+};
 
 const testimonials = [
     {
@@ -33,7 +37,7 @@ const testimonials = [
     },
 ];
 
-export default function Home() {
+export default function Home({ categories, featuredProducts, newArrivals }: HomeProps) {
     return (
         <StoreLayout>
             <Head title="Home" />
@@ -170,7 +174,7 @@ export default function Home() {
                         </Button>
                     </div>
                     <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-                        {mockCategories.map((cat) => (
+                        {categories.map((cat) => (
                             <Link
                                 key={cat.id}
                                 href={`/shop?category=${cat.name}`}
@@ -311,7 +315,7 @@ export default function Home() {
                         </Button>
                     </div>
                     <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                        {mockProducts.slice(4).map((product) => (
+                        {newArrivals.map((product) => (
                             <ProductCard key={product.id} product={product} />
                         ))}
                     </div>

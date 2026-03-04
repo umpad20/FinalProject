@@ -10,13 +10,25 @@ class CustomerController extends Controller
     public function dashboard()
     {
         $user = auth()->user();
-        $orders = $user->orders()->latest()->get();
+        $orders = $user->orders()->with(['items', 'delivery'])->latest()->get();
+
+        // totalSpent: e-cash paid immediately; COD only when delivered
+        $ecashSpent = (float) $orders
+            ->where('status', '!=', 'cancelled')
+            ->whereIn('payment_method', ['gcash', 'card'])
+            ->sum('total');
+
+        $codSpent = (float) $orders
+            ->where('status', '!=', 'cancelled')
+            ->where('payment_method', 'cod')
+            ->filter(fn ($o) => $o->delivery && $o->delivery->status === 'delivered')
+            ->sum('total');
 
         return Inertia::render('customer/dashboard', [
             'stats' => [
                 'totalOrders' => $orders->count(),
                 'pendingOrders' => $orders->where('status', 'pending')->count(),
-                'totalSpent' => (float) $orders->where('status', '!=', 'cancelled')->sum('total'),
+                'totalSpent' => $ecashSpent + $codSpent,
             ],
             'recentOrders' => $orders->take(5)->map(fn ($o) => $this->formatOrder($o)),
         ]);
@@ -61,7 +73,13 @@ class CustomerController extends Controller
                 'total' => (float) $order->total,
                 'status' => $order->status,
                 'paymentMethod' => $order->payment_method,
-                'shippingAddress' => $order->shipping_address,
+                'shippingAddress' => is_array($order->shipping_address)
+                    ? implode(', ', array_filter([
+                        $order->shipping_address['address'] ?? '',
+                        $order->shipping_address['city'] ?? '',
+                        $order->shipping_address['province'] ?? '',
+                    ]))
+                    : ($order->shipping_address ?? ''),
                 'delivery' => $order->delivery ? [
                     'trackingNumber' => $order->delivery->tracking_number,
                     'status' => $order->delivery->status,

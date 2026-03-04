@@ -3,7 +3,31 @@ import { ArrowLeft, CheckCircle2, Clock, Package, Truck } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import StoreLayout from '@/layouts/store-layout';
-import { formatPrice, mockOrders } from '@/lib/mock-data';
+import { formatPrice } from '@/lib/utils';
+import type { OrderItem } from '@/types/store';
+
+type OrderDetailOrder = {
+    id: number;
+    orderNumber: string;
+    items: OrderItem[];
+    subtotal: number;
+    shipping: number;
+    total: number;
+    status: string;
+    paymentMethod: string;
+    shippingAddress: string;
+    delivery: {
+        trackingNumber: string | null;
+        status: string;
+        estimatedDate: string | null;
+    } | null;
+    createdAt: string;
+    updatedAt: string;
+};
+
+type OrderDetailProps = {
+    order: OrderDetailOrder;
+};
 
 const statusSteps = [
     { key: 'pending', label: 'Order Placed', icon: Clock },
@@ -14,8 +38,7 @@ const statusSteps = [
 
 const statusOrder = ['pending', 'processing', 'shipped', 'completed'];
 
-export default function OrderDetail({ id }: { id?: number }) {
-    const order = mockOrders.find((o) => o.id === Number(id)) || mockOrders[0];
+export default function OrderDetail({ order }: OrderDetailProps) {
     const currentStepIndex = statusOrder.indexOf(order.status);
 
     return (
@@ -36,7 +59,7 @@ export default function OrderDetail({ id }: { id?: number }) {
                             {order.orderNumber}
                         </h1>
                         <p className="text-sm text-muted-foreground">
-                            Placed on {order.createdAt}
+                            Placed on {new Date(order.createdAt).toLocaleDateString()}
                         </p>
                     </div>
                     <span
@@ -150,13 +173,13 @@ export default function OrderDetail({ id }: { id?: number }) {
                                     <span className="text-muted-foreground">
                                         Subtotal
                                     </span>
-                                    <span>{formatPrice(order.total)}</span>
+                                    <span>{formatPrice(order.subtotal)}</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
                                     <span className="text-muted-foreground">
                                         Shipping
                                     </span>
-                                    <span>Free</span>
+                                    <span>{order.shipping > 0 ? formatPrice(order.shipping) : 'Free'}</span>
                                 </div>
                                 <Separator />
                                 <div className="flex justify-between text-base font-bold">
@@ -173,15 +196,25 @@ export default function OrderDetail({ id }: { id?: number }) {
                             <CardTitle>Shipping Address</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <p className="text-sm font-medium">
-                                {order.customerName}
-                            </p>
                             <p className="text-sm text-muted-foreground">
                                 {order.shippingAddress}
                             </p>
-                            <p className="mt-2 text-sm text-muted-foreground">
-                                {order.customerEmail}
-                            </p>
+                            {order.delivery && (
+                                <div className="mt-3 space-y-1">
+                                    {order.delivery.trackingNumber && (
+                                        <p className="text-sm">
+                                            <span className="text-muted-foreground">Tracking: </span>
+                                            <span className="font-medium">{order.delivery.trackingNumber}</span>
+                                        </p>
+                                    )}
+                                    {order.delivery.estimatedDate && (
+                                        <p className="text-sm">
+                                            <span className="text-muted-foreground">Est. delivery: </span>
+                                            <span className="font-medium">{new Date(order.delivery.estimatedDate).toLocaleDateString()}</span>
+                                        </p>
+                                    )}
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
 
@@ -192,11 +225,13 @@ export default function OrderDetail({ id }: { id?: number }) {
                         </CardHeader>
                         <CardContent>
                             <p className="text-sm font-medium">
-                                Cash on Delivery
+                                {order.paymentMethod === 'cod' ? 'Cash on Delivery' : order.paymentMethod}
                             </p>
-                            <p className="text-sm text-muted-foreground">
-                                Payment will be collected upon delivery
-                            </p>
+                            {order.paymentMethod === 'cod' && (
+                                <p className="text-sm text-muted-foreground">
+                                    Payment will be collected upon delivery
+                                </p>
+                            )}
                             <p className="mt-3 text-sm">
                                 <span className="text-muted-foreground">
                                     Amount:{' '}
