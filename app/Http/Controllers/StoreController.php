@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Review;
 use Inertia\Inertia;
 
 class StoreController extends Controller
@@ -25,6 +26,21 @@ class StoreController extends Controller
             ->get()
             ->map(fn ($p) => $this->formatProduct($p));
 
+        // Fetch latest reviews sorted by most helpful (most likes), take 3
+        $latestReviews = Review::with('user')
+            ->withCount('likes')
+            ->orderByDesc('likes_count')
+            ->orderByDesc('created_at')
+            ->take(3)
+            ->get()
+            ->map(fn ($r) => [
+                'id' => $r->id,
+                'userName' => $r->user->name,
+                'rating' => $r->rating,
+                'comment' => $r->comment,
+                'likesCount' => $r->likes_count,
+            ]);
+
         return Inertia::render('store/home', [
             'categories' => $categories->map(fn ($c) => [
                 'id' => $c->id,
@@ -35,6 +51,7 @@ class StoreController extends Controller
             ]),
             'featuredProducts' => $featuredProducts,
             'newArrivals' => $newArrivals,
+            'latestReviews' => $latestReviews,
         ]);
     }
 
@@ -72,9 +89,34 @@ class StoreController extends Controller
             ->get()
             ->map(fn ($p) => $this->formatProduct($p));
 
+        // Load reviews with user and likes count, sorted by most helpful
+        $userId = auth()->id();
+        $reviews = $product->reviews()
+            ->with('user')
+            ->withCount('likes')
+            ->orderByDesc('likes_count')
+            ->orderByDesc('created_at')
+            ->get()
+            ->map(fn ($r) => [
+                'id' => $r->id,
+                'userName' => $r->user->name,
+                'rating' => $r->rating,
+                'comment' => $r->comment,
+                'likesCount' => $r->likes_count,
+                'likedByUser' => $userId ? $r->likes()->where('user_id', $userId)->exists() : false,
+                'createdAt' => $r->created_at->toISOString(),
+            ]);
+
+        // Calculate average rating
+        $avgRating = $product->reviews()->avg('rating');
+        $reviewCount = $product->reviews()->count();
+
         return Inertia::render('store/product-detail', [
             'product' => $this->formatProduct($product),
             'relatedProducts' => $relatedProducts,
+            'reviews' => $reviews,
+            'avgRating' => round($avgRating ?? 0, 1),
+            'reviewCount' => $reviewCount,
         ]);
     }
 

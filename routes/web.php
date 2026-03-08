@@ -3,6 +3,7 @@
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\Admin\CustomerController as AdminCustomerController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
@@ -55,6 +56,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/orders', [CustomerController::class, 'orders'])->name('orders');
         Route::get('/orders/{order}', [CustomerController::class, 'orderDetail'])->name('orders.show');
     });
+
+    // Reviews
+    Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::post('/reviews/{review}/like', [ReviewController::class, 'toggleLike'])->name('reviews.toggleLike');
 });
 
 // ──────────────────────────────────────────────

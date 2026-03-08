@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\Review;
 use Inertia\Inertia;
 
 class CustomerController extends Controller
@@ -55,18 +56,26 @@ class CustomerController extends Controller
 
         $order->load(['items', 'delivery']);
 
+        // Find which products already have reviews from this user for this order
+        $reviewedProductIds = Review::where('user_id', auth()->id())
+            ->where('order_id', $order->id)
+            ->pluck('product_id')
+            ->toArray();
+
         return Inertia::render('customer/order-detail', [
             'order' => [
                 'id' => $order->id,
                 'orderNumber' => $order->order_number,
                 'items' => $order->items->map(fn ($i) => [
                     'id' => $i->id,
+                    'productId' => $i->product_id,
                     'productName' => $i->product_name,
                     'productImage' => $i->product_image,
                     'size' => $i->size,
                     'color' => $i->color,
                     'quantity' => $i->quantity,
                     'price' => (float) $i->price,
+                    'reviewed' => in_array($i->product_id, $reviewedProductIds),
                 ]),
                 'subtotal' => (float) $order->subtotal,
                 'shipping' => (float) $order->shipping,

@@ -38,6 +38,11 @@ class Product extends Model
         return $this->hasMany(ProductVariant::class);
     }
 
+    public function reviews(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
     public function getSizesAttribute(): array
     {
         return $this->variants->pluck('size')->unique()->values()->toArray();

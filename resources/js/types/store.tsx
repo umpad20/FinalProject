@@ -94,3 +94,13 @@ export type DeliveryItem = {
     estimatedDate: string;
     trackingNumber: string;
 };
+
+export type Review = {
+    id: number;
+    userName: string;
+    rating: number;
+    comment: string;
+    likesCount: number;
+    likedByUser: boolean;
+    createdAt: string;
+};

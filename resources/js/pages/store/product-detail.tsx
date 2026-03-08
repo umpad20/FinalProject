@@ -1,21 +1,27 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Heart, Minus, Plus, ShoppingBag, Star, Truck } from 'lucide-react';
 import { useState } from 'react';
 import ProductCard from '@/components/product-card';
+import ReviewList from '@/components/review-list';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import StoreLayout from '@/layouts/store-layout';
 import { formatPrice } from '@/lib/utils';
-import type { Product } from '@/types/store';
+import type { Product, Review } from '@/types/store';
 
 type ProductDetailProps = {
     product: Product;
     relatedProducts: Product[];
+    reviews: Review[];
+    avgRating: number;
+    reviewCount: number;
 };
 
-export default function ProductDetail({ product, relatedProducts }: ProductDetailProps) {
+export default function ProductDetail({ product, relatedProducts, reviews, avgRating, reviewCount }: ProductDetailProps) {
+    const { auth } = usePage().props;
+    const isAuthenticated = !!auth?.user;
 
     const [selectedSize, setSelectedSize] = useState<string>('');
     const [selectedColor, setSelectedColor] = useState<string>(
@@ -136,17 +142,17 @@ export default function ProductDetail({ product, relatedProducts }: ProductDetai
                             <div className="mt-2 flex items-center gap-2">
                                 <div
                                     className="flex gap-0.5"
-                                    aria-label="Rating: 4.5 out of 5 stars"
+                                    aria-label={`Rating: ${avgRating} out of 5 stars`}
                                 >
                                     {Array.from({ length: 5 }).map((_, i) => (
                                         <Star
                                             key={i}
-                                            className={`h-4 w-4 ${i < 4 ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground/30'}`}
+                                            className={`h-4 w-4 ${i < Math.round(avgRating) ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground/30'}`}
                                         />
                                     ))}
                                 </div>
                                 <span className="text-sm text-muted-foreground">
-                                    (24 reviews)
+                                    ({reviewCount} review{reviewCount !== 1 ? 's' : ''})
                                 </span>
                             </div>
                         </div>
@@ -364,7 +370,7 @@ export default function ProductDetail({ product, relatedProducts }: ProductDetai
                             </TabsTrigger>
                             <TabsTrigger value="details">Details</TabsTrigger>
                             <TabsTrigger value="reviews">
-                                Reviews (24)
+                                Reviews ({reviewCount})
                             </TabsTrigger>
                         </TabsList>
                         <TabsContent value="description" className="mt-6">
@@ -434,62 +440,12 @@ export default function ProductDetail({ product, relatedProducts }: ProductDetai
                             </div>
                         </TabsContent>
                         <TabsContent value="reviews" className="mt-6">
-                            <div className="space-y-6">
-                                {[
-                                    {
-                                        name: 'Maria S.',
-                                        date: '2026-01-15',
-                                        rating: 5,
-                                        text: 'Excellent quality! Fits perfectly and the material is so soft.',
-                                    },
-                                    {
-                                        name: 'Juan D.',
-                                        date: '2026-01-10',
-                                        rating: 4,
-                                        text: 'Great product. Shipping was fast. Would buy again.',
-                                    },
-                                    {
-                                        name: 'Ana G.',
-                                        date: '2025-12-28',
-                                        rating: 5,
-                                        text: 'Love it! The color is exactly as shown in the photos.',
-                                    },
-                                ].map((review, i) => (
-                                    <div
-                                        key={i}
-                                        className="border-b border-border pb-6 last:border-0"
-                                    >
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-sm font-semibold">
-                                                    {review.name.charAt(0)}
-                                                </div>
-                                                <div>
-                                                    <p className="text-sm font-medium">
-                                                        {review.name}
-                                                    </p>
-                                                    <p className="text-xs text-muted-foreground">
-                                                        {review.date}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div className="flex gap-0.5">
-                                                {Array.from({ length: 5 }).map(
-                                                    (_, j) => (
-                                                        <Star
-                                                            key={j}
-                                                            className={`h-3 w-3 ${j < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground/30'}`}
-                                                        />
-                                                    ),
-                                                )}
-                                            </div>
-                                        </div>
-                                        <p className="mt-3 text-sm text-muted-foreground">
-                                            {review.text}
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
+                            <ReviewList
+                                reviews={reviews}
+                                avgRating={avgRating}
+                                reviewCount={reviewCount}
+                                isAuthenticated={isAuthenticated}
+                            />
                         </TabsContent>
                     </Tabs>
                 </div>

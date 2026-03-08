@@ -13,31 +13,22 @@ import { Card, CardContent } from '@/components/ui/card';
 import StoreLayout from '@/layouts/store-layout';
 import type { Product, Category } from '@/types/store';
 
+type HomeReview = {
+    id: number;
+    userName: string;
+    rating: number;
+    comment: string;
+    likesCount: number;
+};
+
 type HomeProps = {
     categories: Category[];
     featuredProducts: Product[];
     newArrivals: Product[];
+    latestReviews: HomeReview[];
 };
 
-const testimonials = [
-    {
-        name: 'Maria S.',
-        text: 'Amazing quality clothes at great prices! Fast shipping too.',
-        rating: 5,
-    },
-    {
-        name: 'Juan D.',
-        text: 'Love the minimalist designs. My go-to store for everyday wear.',
-        rating: 5,
-    },
-    {
-        name: 'Ana G.',
-        text: 'The leather jacket is absolutely stunning. Exceeded my expectations.',
-        rating: 4,
-    },
-];
-
-export default function Home({ categories, featuredProducts, newArrivals }: HomeProps) {
+export default function Home({ categories, featuredProducts, newArrivals, latestReviews }: HomeProps) {
     return (
         <StoreLayout>
             <Head title="Home" />
@@ -258,6 +249,7 @@ export default function Home({ categories, featuredProducts, newArrivals }: Home
             </section>
 
             {/* Testimonials */}
+            {latestReviews.length > 0 && (
             <section
                 className="bg-muted/30 py-16"
                 aria-label="Customer testimonials"
@@ -272,24 +264,24 @@ export default function Home({ categories, featuredProducts, newArrivals }: Home
                         </p>
                     </div>
                     <div className="grid gap-6 md:grid-cols-3">
-                        {testimonials.map((t, i) => (
-                            <Card key={i}>
+                        {latestReviews.map((review) => (
+                            <Card key={review.id}>
                                 <CardContent className="p-6">
                                     <div className="mb-3 flex gap-1">
                                         {Array.from({ length: 5 }).map(
                                             (_, j) => (
                                                 <Star
                                                     key={j}
-                                                    className={`h-4 w-4 ${j < t.rating ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground/30'}`}
+                                                    className={`h-4 w-4 ${j < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-muted-foreground/30'}`}
                                                 />
                                             ),
                                         )}
                                     </div>
                                     <p className="mb-4 text-sm text-muted-foreground">
-                                        &ldquo;{t.text}&rdquo;
+                                        &ldquo;{review.comment}&rdquo;
                                     </p>
                                     <p className="text-sm font-semibold">
-                                        {t.name}
+                                        {review.userName}
                                     </p>
                                 </CardContent>
                             </Card>
@@ -297,6 +289,7 @@ export default function Home({ categories, featuredProducts, newArrivals }: Home
                     </div>
                 </div>
             </section>
+            )}
 
             {/* New Arrivals */}
             <section className="py-16" aria-label="New arrivals">

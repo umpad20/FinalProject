@@ -1,15 +1,28 @@
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, CheckCircle2, Clock, Package, Truck } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Clock, Package, Star, Truck } from 'lucide-react';
+import ReviewForm from '@/components/review-form';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import StoreLayout from '@/layouts/store-layout';
 import { formatPrice } from '@/lib/utils';
-import type { OrderItem } from '@/types/store';
+
+type OrderDetailItem = {
+    id: number;
+    productId: number;
+    productName: string;
+    productImage: string;
+    size: string;
+    color: string;
+    quantity: number;
+    price: number;
+    reviewed: boolean;
+};
 
 type OrderDetailOrder = {
     id: number;
     orderNumber: string;
-    items: OrderItem[];
+    items: OrderDetailItem[];
     subtotal: number;
     shipping: number;
     total: number;
@@ -151,6 +164,23 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                                             <p className="text-sm text-muted-foreground">
                                                 Qty: {item.quantity}
                                             </p>
+                                            {/* Review button - only for completed orders */}
+                                            {order.status === 'completed' && (
+                                                <div className="mt-2">
+                                                    {item.reviewed ? (
+                                                        <Badge variant="secondary" className="gap-1">
+                                                            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                                                            Reviewed
+                                                        </Badge>
+                                                    ) : (
+                                                        <ReviewForm
+                                                            productId={item.productId}
+                                                            orderId={order.id}
+                                                            productName={item.productName}
+                                                        />
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="text-right">
                                             <p className="font-semibold">
