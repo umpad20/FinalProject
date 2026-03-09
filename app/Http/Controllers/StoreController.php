@@ -71,6 +71,7 @@ class StoreController extends Controller
         return Inertia::render('store/products', [
             'products' => $products,
             'categories' => $categories,
+            'category' => request()->query('category'),
         ]);
     }
 
