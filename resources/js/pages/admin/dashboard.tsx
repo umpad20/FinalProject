@@ -1,3 +1,4 @@
+// John Kenzie Umpad
 import { Head } from '@inertiajs/react';
 import {
     ArrowDown,
