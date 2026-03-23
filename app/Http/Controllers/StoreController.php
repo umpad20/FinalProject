@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Review;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class StoreController extends Controller
@@ -72,7 +73,37 @@ class StoreController extends Controller
             'products' => $products,
             'categories' => $categories,
             'category' => request()->query('category'),
+            'query' => request()->query('query'),
         ]);
+    }
+
+    public function search(Request $request)
+    {
+        $q = $request->query('q', '');
+        
+        if (empty($q)) {
+            return response()->json([]);
+        }
+
+        $products = Product::with(['images', 'category'])
+            ->where('status', 'active')
+            ->where(function ($query) use ($q) {
+                $query->where('name', 'like', "%{$q}%")
+                      ->orWhere('description', 'like', "%{$q}%");
+            })
+            ->take(5)
+            ->get()
+            ->map(function ($p) {
+                return [
+                    'id' => $p->id,
+                    'name' => $p->name,
+                    'slug' => $p->slug,
+                    'image' => $p->images->first()?->url,
+                    'category' => $p->category->name,
+                ];
+            });
+
+        return response()->json($products);
     }
 
     public function show(string $slug)

@@ -38,6 +38,23 @@ type CartProps = {
 export default function Cart({ cartItems }: CartProps) {
     const items = cartItems;
     const [promoCode, setPromoCode] = useState('');
+    const [selectedItems, setSelectedItems] = useState<number[]>(items.map(i => i.id));
+
+    const handleSelectAll = () => {
+        if (selectedItems.length === items.length) {
+            setSelectedItems([]);
+        } else {
+            setSelectedItems(items.map(i => i.id));
+        }
+    };
+
+    const toggleSelection = (id: number) => {
+        if (selectedItems.includes(id)) {
+            setSelectedItems(selectedItems.filter(i => i !== id));
+        } else {
+            setSelectedItems([...selectedItems, id]);
+        }
+    };
 
     const updateQuantity = (id: number, newQty: number) => {
         if (newQty < 1) return;
@@ -48,7 +65,8 @@ export default function Cart({ cartItems }: CartProps) {
         router.delete(`/cart/${id}`, { preserveScroll: true });
     };
 
-    const subtotal = items.reduce(
+    const selectedCartItems = items.filter(item => selectedItems.includes(item.id));
+    const subtotal = selectedCartItems.reduce(
         (sum, item) => sum + item.product.price * item.quantity,
         0,
     );
@@ -103,7 +121,14 @@ export default function Cart({ cartItems }: CartProps) {
                         <div className="lg:col-span-2">
                             {/* Header */}
                             <div className="hidden border-b border-border pb-3 md:grid md:grid-cols-12 md:gap-4">
-                                <span className="col-span-6 text-sm font-semibold text-muted-foreground">
+                                <span className="col-span-6 flex items-center gap-3 text-sm font-semibold text-muted-foreground">
+                                    <input 
+                                        type="checkbox" 
+                                        className="h-4 w-4 rounded border-border text-primary cursor-pointer accent-primary" 
+                                        checked={selectedItems.length === items.length && items.length > 0} 
+                                        onChange={handleSelectAll} 
+                                        aria-label="Select all items"
+                                    />
                                     Product
                                 </span>
                                 <span className="col-span-2 text-center text-sm font-semibold text-muted-foreground">
@@ -125,6 +150,13 @@ export default function Cart({ cartItems }: CartProps) {
                                     >
                                         {/* Product */}
                                         <div className="col-span-6 flex items-center gap-4">
+                                            <input 
+                                                type="checkbox" 
+                                                className="h-4 w-4 rounded border-border text-primary cursor-pointer shrink-0 accent-primary" 
+                                                checked={selectedItems.includes(item.id)} 
+                                                onChange={() => toggleSelection(item.id)}
+                                                aria-label={`Select ${item.product.name}`}
+                                            />
                                             <Link
                                                 href={`/shop/${item.product.slug}`}
                                                 className="h-24 w-20 shrink-0 overflow-hidden rounded-lg bg-muted"
@@ -244,7 +276,7 @@ export default function Cart({ cartItems }: CartProps) {
                                 <div className="space-y-3">
                                     <div className="flex justify-between text-sm">
                                         <span className="text-muted-foreground">
-                                            Subtotal ({items.length} items)
+                                            Subtotal ({selectedItems.length} item{selectedItems.length !== 1 ? 's' : ''})
                                         </span>
                                         <span className="font-medium">
                                             {formatPrice(subtotal)}
@@ -300,12 +332,15 @@ export default function Cart({ cartItems }: CartProps) {
                                 <Button
                                     className="mt-6 w-full"
                                     size="lg"
-                                    asChild
+                                    disabled={selectedItems.length === 0}
+                                    onClick={() => {
+                                        if (selectedItems.length > 0) {
+                                            router.get('/checkout', { item_ids: selectedItems });
+                                        }
+                                    }}
                                 >
-                                    <Link href="/checkout">
-                                        Proceed to Checkout{' '}
-                                        <ArrowRight className="ml-2 h-4 w-4" />
-                                    </Link>
+                                    Proceed to Checkout{' '}
+                                    <ArrowRight className="ml-2 h-4 w-4" />
                                 </Button>
 
                                 <p className="mt-3 text-center text-xs text-muted-foreground">

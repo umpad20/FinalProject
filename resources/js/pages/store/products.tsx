@@ -41,6 +41,7 @@ type ShopProps = {
     products: Product[];
     categories: ShopCategory[];
     category?: string;
+    query?: string;
 };
 
 const allSizes = ['XS', 'S', 'M', 'L', 'XL'];
@@ -57,8 +58,8 @@ const allColors = [
 
 type SortOption = 'newest' | 'price-asc' | 'price-desc' | 'name-asc';
 
-export default function Shop({ products: allProducts, categories, category }: ShopProps) {
-    const [searchQuery, setSearchQuery] = useState('');
+export default function Shop({ products: allProducts, categories, category, query }: ShopProps) {
+    const [searchQuery, setSearchQuery] = useState(query || '');
     const [selectedCategory, setSelectedCategory] = useState<string>(
         category || '',
     );

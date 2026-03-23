@@ -20,8 +20,10 @@ type ProductDetailProps = {
 };
 
 export default function ProductDetail({ product, relatedProducts, reviews, avgRating, reviewCount }: ProductDetailProps) {
-    const { auth } = usePage().props;
+    const auth = (usePage().props as any).auth;
     const isAuthenticated = !!auth?.user;
+    const favoriteIds: number[] = auth?.user?.favorite_ids || [];
+    const liked = favoriteIds.includes(product.id);
 
     const [selectedSize, setSelectedSize] = useState<string>('');
     const [selectedColor, setSelectedColor] = useState<string>(
@@ -29,7 +31,7 @@ export default function ProductDetail({ product, relatedProducts, reviews, avgRa
     );
     const [quantity, setQuantity] = useState(1);
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-    const [liked, setLiked] = useState(false);
+    const [isLiking, setIsLiking] = useState(false);
     const [addingToCart, setAddingToCart] = useState(false);
 
     const currentVariant = product.variants.find(
@@ -331,7 +333,20 @@ export default function ProductDetail({ product, relatedProducts, reviews, avgRa
                             <Button
                                 variant="outline"
                                 size="lg"
-                                onClick={() => setLiked(!liked)}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    if (isLiking) return;
+                                    if (!auth?.user) {
+                                        router.visit('/login');
+                                        return;
+                                    }
+                                    setIsLiking(true);
+                                    router.post(`/favorites/${product.id}/toggle`, {}, {
+                                        preserveScroll: true,
+                                        onFinish: () => setIsLiking(false),
+                                    });
+                                }}
+                                disabled={isLiking}
                                 aria-label={
                                     liked
                                         ? 'Remove from wishlist'

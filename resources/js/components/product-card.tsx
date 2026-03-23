@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { Heart } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -7,8 +7,13 @@ import { formatPrice } from '@/lib/utils';
 import type { Product } from '@/types/store';
 
 export default function ProductCard({ product }: { product: Product }) {
+    const page = usePage();
+    const auth = (page.props as any).auth;
+    const favoriteIds: number[] = auth?.user?.favorite_ids || [];
+    const liked = favoriteIds.includes(product.id);
+
     const [isHovered, setIsHovered] = useState(false);
-    const [liked, setLiked] = useState(false);
+    const [isLiking, setIsLiking] = useState(false);
     const hasDiscount =
         product.compareAtPrice && product.compareAtPrice > product.price;
     const discountPercent = hasDiscount
@@ -58,8 +63,18 @@ export default function ProductCard({ product }: { product: Product }) {
                     className={`absolute top-2 right-2 h-8 w-8 rounded-full transition-opacity ${isHovered || liked ? 'opacity-100' : 'opacity-0'}`}
                     onClick={(e) => {
                         e.preventDefault();
-                        setLiked(!liked);
+                        if (isLiking) return;
+                        if (!auth?.user) {
+                            router.visit('/login');
+                            return;
+                        }
+                        setIsLiking(true);
+                        router.post(`/favorites/${product.id}/toggle`, {}, {
+                            preserveScroll: true,
+                            onFinish: () => setIsLiking(false),
+                        });
                     }}
+                    disabled={isLiking}
                     aria-label={
                         liked ? 'Remove from wishlist' : 'Add to wishlist'
                     }

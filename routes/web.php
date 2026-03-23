@@ -23,6 +23,7 @@ use Laravel\Fortify\Features;
 
 Route::get('/', [StoreController::class, 'home'])->name('home');
 Route::get('/shop', [StoreController::class, 'products'])->name('shop');
+Route::get('/api/search', [StoreController::class, 'search'])->name('api.search');
 Route::get('/shop/{slug}', [StoreController::class, 'show'])->name('product.show');
 
 // Keep original welcome page accessible if needed
@@ -60,6 +61,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Reviews
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
     Route::post('/reviews/{review}/like', [ReviewController::class, 'toggleLike'])->name('reviews.toggleLike');
+
+    // Favorites
+    Route::get('/favorites', [\App\Http\Controllers\FavoriteController::class, 'index'])->name('favorites.index');
+    Route::post('/favorites/{product}/toggle', [\App\Http\Controllers\FavoriteController::class, 'toggle'])->name('favorites.toggle');
 });
 
 // ──────────────────────────────────────────────

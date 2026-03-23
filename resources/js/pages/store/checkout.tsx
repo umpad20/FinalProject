@@ -38,6 +38,7 @@ export default function Checkout({ cartItems }: CheckoutProps) {
     const items = cartItems;
 
     const { data, setData, post, processing, errors } = useForm({
+        item_ids: items.map(item => item.id),
         first_name: '',
         last_name: '',
         email: '',

@@ -47,6 +47,7 @@ class HandleInertiaRequests extends Middleware
                     'email' => $user->email,
                     'is_admin' => (bool) $user->is_admin,
                     'profile_photo_url' => $user->profile_photo_url ?? null,
+                    'favorite_ids' => $user->favorites()->pluck('products.id')->toArray(),
                 ] : null,
             ],
             'cartCount' => $user ? $user->cartItems()->sum('quantity') : 0,

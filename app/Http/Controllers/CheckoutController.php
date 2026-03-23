@@ -13,14 +13,20 @@ use Inertia\Inertia;
 
 class CheckoutController extends Controller
 {
-    public function show()
+    public function show(Request $request)
     {
-        $cartItems = CartItem::with(['product.images', 'variant'])
-            ->where('user_id', auth()->id())
-            ->get();
+        $query = CartItem::with(['product.images', 'variant'])
+            ->where('user_id', auth()->id());
+
+        $itemIds = $request->query('item_ids');
+        if (!empty($itemIds) && is_array($itemIds)) {
+            $query->whereIn('id', $itemIds);
+        }
+
+        $cartItems = $query->get();
 
         if ($cartItems->isEmpty()) {
-            return redirect()->route('cart')->with('error', 'Your cart is empty.');
+            return redirect()->route('cart')->with('error', 'Your cart is empty or no items were selected.');
         }
 
         return Inertia::render('store/checkout', [
@@ -49,6 +55,8 @@ class CheckoutController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'item_ids' => 'required|array|min:1',
+            'item_ids.*' => 'exists:cart_items,id',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email',
@@ -62,10 +70,11 @@ class CheckoutController extends Controller
 
         $cartItems = CartItem::with(['product', 'variant'])
             ->where('user_id', auth()->id())
+            ->whereIn('id', $request->item_ids)
             ->get();
 
         if ($cartItems->isEmpty()) {
-            return back()->withErrors(['cart' => 'Your cart is empty.']);
+            return back()->withErrors(['cart' => 'Invalid items selected.']);
         }
 
         // Check stock
@@ -127,8 +136,8 @@ class CheckoutController extends Controller
             'address' => "{$request->address}, {$request->city}, {$request->province} {$request->zip}",
         ]);
 
-        // Clear cart
-        CartItem::where('user_id', auth()->id())->delete();
+        // Clear selected cart items
+        CartItem::where('user_id', auth()->id())->whereIn('id', $request->item_ids)->delete();
 
         return redirect()->route('customer.orders.show', $order->id)
             ->with('success', 'Order placed successfully!');

@@ -1,4 +1,4 @@
-import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage, router } from '@inertiajs/react';
 import {
     Heart,
     LogIn,
@@ -10,7 +10,7 @@ import {
     User,
     X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -45,6 +45,31 @@ export default function StoreLayout({
     const { appearance, updateAppearance } = useAppearance();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [suggestions, setSuggestions] = useState<any[]>([]);
+    
+    useEffect(() => {
+        if (!searchQuery.trim()) {
+            setSuggestions([]);
+            return;
+        }
+        const timer = setTimeout(() => {
+            fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`)
+                .then(r => r.json())
+                .then(data => setSuggestions(data))
+                .catch(e => console.error(e));
+        }, 250);
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+
+    const handleSearchSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter' && searchQuery.trim()) {
+            setSearchOpen(false);
+            setSuggestions([]);
+            router.get(`/shop?query=${encodeURIComponent(searchQuery)}`);
+        }
+    };
+
     const page = usePage();
     const auth = (page.props as any).auth;
     const user = auth?.user;
@@ -163,7 +188,7 @@ export default function StoreLayout({
                                 asChild
                                 aria-label="Wishlist"
                             >
-                                <Link href="/shop">
+                                <Link href="/favorites">
                                     <Heart className="h-5 w-5" />
                                 </Link>
                             </Button>
@@ -275,17 +300,53 @@ export default function StoreLayout({
                                     className="pr-10 pl-10"
                                     autoFocus
                                     aria-label="Search products"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onKeyDown={handleSearchSubmit}
                                 />
                                 <Button
                                     variant="ghost"
                                     size="icon"
                                     className="absolute top-0 right-0 h-full"
-                                    onClick={() => setSearchOpen(false)}
+                                    onClick={() => {
+                                        setSearchOpen(false);
+                                        setSearchQuery('');
+                                        setSuggestions([]);
+                                    }}
                                     aria-label="Close search"
                                 >
                                     <X className="h-4 w-4" />
                                 </Button>
                             </div>
+                            {suggestions.length > 0 && (
+                                <div className="absolute z-50 w-full max-w-7xl mt-2 overflow-hidden rounded-md border border-border bg-popover shadow-md relative">
+                                    <div className="absolute inset-0 bg-background/95 backdrop-blur -z-10"></div>
+                                    {suggestions.map((suggestion) => (
+                                        <Link 
+                                            key={suggestion.id} 
+                                            href={`/shop/${suggestion.slug}`}
+                                            className="flex items-center gap-4 px-4 py-3 hover:bg-muted/80 transition-colors border-b border-border/50 last:border-0"
+                                            onClick={() => {
+                                                setSearchOpen(false);
+                                                setSearchQuery('');
+                                                setSuggestions([]);
+                                            }}
+                                        >
+                                            <div className="h-12 w-10 shrink-0 overflow-hidden rounded-md bg-muted">
+                                                {suggestion.image ? (
+                                                    <img src={suggestion.image} alt={suggestion.name} className="h-full w-full object-cover" />
+                                                ) : (
+                                                    <div className="h-full w-full bg-secondary"></div>
+                                                )}
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-medium">{suggestion.name}</p>
+                                                <p className="text-xs text-muted-foreground">{suggestion.category}</p>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

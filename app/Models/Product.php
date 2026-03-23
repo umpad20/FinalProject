@@ -55,4 +55,8 @@ class Product extends Model
             'hex' => $v->color_hex,
         ])->values()->toArray();
     }
+    public function favoritedBy(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'favorites', 'product_id', 'user_id')->withTimestamps();
+    }
 }
