@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -50,6 +51,13 @@ class HandleInertiaRequests extends Middleware
                     'favorite_ids' => $user->favorites()->pluck('products.id')->toArray(),
                 ] : null,
             ],
+            'categories' => Category::orderBy('name')->get()->map(function ($cat) {
+                return [
+                    'id' => $cat->id,
+                    'name' => $cat->name,
+                    'slug' => $cat->slug,
+                ];
+            }),
             'cartCount' => $user ? $user->cartItems()->sum('quantity') : 0,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

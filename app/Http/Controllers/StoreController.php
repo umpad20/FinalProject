@@ -177,6 +177,8 @@ class StoreController extends Controller
             ])->toArray(),
             'sizes' => $product->sizes,
             'colors' => $product->colors,
+            'total_stock' => $product->total_stock,
+            'is_new' => $product->is_new,
             'featured' => $product->featured,
             'createdAt' => $product->created_at->toISOString(),
         ];

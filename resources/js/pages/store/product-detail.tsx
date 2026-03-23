@@ -139,6 +139,14 @@ export default function ProductDetail({ product, relatedProducts, reviews, avgRa
                             <h1 className="mt-1 text-3xl font-bold">
                                 {product.name}
                             </h1>
+                            <div className="mt-2 flex flex-wrap gap-2">
+                                {product.is_new && (
+                                    <Badge variant="secondary" className="bg-green-500 text-white border-0">New Arrival</Badge>
+                                ) || null}
+                                {product.featured && (
+                                    <Badge className="bg-primary text-primary-foreground border-0">Featured</Badge>
+                                ) || null}
+                            </div>
 
                             {/* Rating */}
                             <div className="mt-2 flex items-center gap-2">
@@ -301,8 +309,8 @@ export default function ProductDetail({ product, relatedProducts, reviews, avgRa
                                     <Plus className="h-4 w-4" />
                                 </Button>
                                 {currentVariant && (
-                                    <span className="text-sm text-muted-foreground">
-                                        {currentVariant.stock} in stock
+                                    <span className={`text-sm ${currentVariant.stock <= 5 ? 'text-amber-600 font-semibold animate-pulse' : 'text-muted-foreground'}`}>
+                                        {currentVariant.stock <= 5 ? `Only ${currentVariant.stock} left!` : `${currentVariant.stock} in stock`}
                                     </span>
                                 )}
                             </div>

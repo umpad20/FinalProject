@@ -9,6 +9,7 @@ import {
     Sun,
     User,
     X,
+    ArrowUp,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -28,13 +29,9 @@ import {
 } from '@/components/ui/sheet';
 import { useAppearance } from '@/hooks/use-appearance';
 
-const navLinks = [
+const staticNavLinks = [
     { name: 'Home', href: '/' },
     { name: 'Shop', href: '/shop' },
-    { name: 'T-Shirts', href: '/shop?category=T-Shirts' },
-    { name: 'Pants', href: '/shop?category=Pants' },
-    { name: 'Jackets', href: '/shop?category=Jackets' },
-    { name: 'Dresses', href: '/shop?category=Dresses' },
 ];
 
 export default function StoreLayout({
@@ -42,6 +39,16 @@ export default function StoreLayout({
 }: {
     children: React.ReactNode;
 }) {
+    const page = usePage();
+    const categories = (page.props as any).categories || [];
+    const navLinks = [
+        ...staticNavLinks,
+        ...categories.slice(0, 4).map((cat: any) => ({
+            name: cat.name,
+            href: `/shop?category=${encodeURIComponent(cat.name)}`,
+        })),
+    ];
+
     const { appearance, updateAppearance } = useAppearance();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
@@ -50,7 +57,9 @@ export default function StoreLayout({
     
     useEffect(() => {
         if (!searchQuery.trim()) {
-            setSuggestions([]);
+            if (suggestions.length > 0) {
+                setSuggestions([]);
+            }
             return;
         }
         const timer = setTimeout(() => {
@@ -60,7 +69,21 @@ export default function StoreLayout({
                 .catch(e => console.error(e));
         }, 250);
         return () => clearTimeout(timer);
-    }, [searchQuery]);
+    }, [searchQuery, suggestions.length]);
+
+    const [showBackToTop, setShowBackToTop] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setShowBackToTop(window.scrollY > 400);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    const scrollToTop = () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     const handleSearchSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && searchQuery.trim()) {
@@ -69,8 +92,6 @@ export default function StoreLayout({
             router.get(`/shop?query=${encodeURIComponent(searchQuery)}`);
         }
     };
-
-    const page = usePage();
     const auth = (page.props as any).auth;
     const user = auth?.user;
     const cartCount = (page.props as any).cartCount ?? 0;
@@ -521,6 +542,17 @@ export default function StoreLayout({
                     </div>
                 </div>
             </footer>
+
+            {/* Back to Top Button */}
+            <Button
+                variant="secondary"
+                size="icon"
+                className={`fixed bottom-6 right-6 z-50 h-10 w-10 rounded-full shadow-lg transition-all duration-300 ${showBackToTop ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
+                onClick={scrollToTop}
+                aria-label="Back to top"
+            >
+                <ArrowUp className="h-5 w-5" />
+            </Button>
         </div>
     );
 }

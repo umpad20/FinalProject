@@ -27,6 +27,8 @@ export type Product = {
     variants: ProductVariant[];
     sizes: string[];
     colors: { name: string; hex: string }[];
+    total_stock: number;
+    is_new: boolean;
     featured: boolean;
     createdAt: string;
 };

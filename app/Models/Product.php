@@ -55,6 +55,16 @@ class Product extends Model
             'hex' => $v->color_hex,
         ])->values()->toArray();
     }
+
+    public function getTotalStockAttribute(): int
+    {
+        return $this->variants->sum('stock');
+    }
+
+    public function getIsNewAttribute(): bool
+    {
+        return $this->created_at >= now()->subDays(7);
+    }
     public function favoritedBy(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(User::class, 'favorites', 'product_id', 'user_id')->withTimestamps();

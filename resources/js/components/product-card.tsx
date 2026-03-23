@@ -54,6 +54,19 @@ export default function ProductCard({ product }: { product: Product }) {
                     {product.featured && (
                         <Badge className="text-xs">Featured</Badge>
                     )}
+                    {product.is_new && (
+                        <Badge variant="secondary" className="bg-green-500 text-white text-xs border-0">New</Badge>
+                    )}
+                    {product.total_stock > 0 && product.total_stock <= 5 && (
+                        <Badge variant="outline" className="bg-amber-500 text-white text-xs border-0">
+                            Only {product.total_stock} left
+                        </Badge>
+                    )}
+                    {product.total_stock === 0 && (
+                        <Badge variant="outline" className="bg-gray-500 text-white text-xs border-0">
+                            Out of Stock
+                        </Badge>
+                    )}
                 </div>
 
                 {/* Wishlist button */}
