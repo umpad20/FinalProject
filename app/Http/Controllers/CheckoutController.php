@@ -29,6 +29,11 @@ class CheckoutController extends Controller
             return redirect()->route('cart')->with('error', 'Your cart is empty or no items were selected.');
         }
 
+        // Check if this is first order
+        $previousOrders = Order::where('user_id', auth()->id())
+            ->where('status', '!=', 'cancelled')
+            ->count();
+
         return Inertia::render('store/checkout', [
             'cartItems' => $cartItems->map(fn ($item) => [
                 'id' => $item->id,
@@ -49,6 +54,7 @@ class CheckoutController extends Controller
                 ],
                 'quantity' => $item->quantity,
             ]),
+            'isFirstOrder' => $previousOrders === 0,
         ]);
     }
 
@@ -86,7 +92,19 @@ class CheckoutController extends Controller
 
         $subtotal = $cartItems->sum(fn ($item) => $item->product->price * $item->quantity);
         $shipping = $subtotal >= 2000 ? 0 : 100;
-        $total = $subtotal + $shipping;
+        
+        // Check if this is the user's first order
+        $previousOrders = Order::where('user_id', auth()->id())
+            ->where('status', '!=', 'cancelled')
+            ->count();
+        
+        $discountAmount = 0;
+        if ($previousOrders === 0) {
+            // Apply 20% discount for first-time customers
+            $discountAmount = round($subtotal * 0.20, 2);
+        }
+        
+        $total = $subtotal + $shipping - $discountAmount;
 
         $shippingAddress = [
             'first_name' => $request->first_name,
@@ -105,6 +123,7 @@ class CheckoutController extends Controller
             'status' => 'pending',
             'subtotal' => $subtotal,
             'shipping' => $shipping,
+            'discount_amount' => $discountAmount,
             'total' => $total,
             'payment_method' => $request->payment_method,
             'shipping_address' => $shippingAddress,
@@ -123,9 +142,6 @@ class CheckoutController extends Controller
                 'quantity' => $item->quantity,
                 'price' => $item->product->price,
             ]);
-
-            // Reduce stock
-            $item->variant->decrement('stock', $item->quantity);
         }
 
         // Create delivery record

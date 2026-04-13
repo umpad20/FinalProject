@@ -193,36 +193,13 @@ export default function AdminOrderDetail({ order }: Props) {
                         <CardHeader>
                             <CardTitle>Order Status</CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            <Select value={status} onValueChange={setStatus}>
-                                <SelectTrigger aria-label="Update order status">
-                                    <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="pending">
-                                        Pending
-                                    </SelectItem>
-                                    <SelectItem value="processing">
-                                        Processing
-                                    </SelectItem>
-                                    <SelectItem value="shipped">
-                                        Shipped
-                                    </SelectItem>
-                                    <SelectItem value="completed">
-                                        Completed
-                                    </SelectItem>
-                                    <SelectItem value="cancelled">
-                                        Cancelled
-                                    </SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <Button
-                                className="w-full"
-                                onClick={handleUpdateStatus}
-                                disabled={updating || status === order.status}
-                            >
-                                {updating ? 'Updating...' : 'Update Status'}
-                            </Button>
+                        <CardContent>
+                            <span className="inline-flex items-center rounded-full bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700 capitalize">
+                                {order.status}
+                            </span>
+                            <p className="text-xs text-muted-foreground mt-3">
+                                Update status through the Deliveries page
+                            </p>
                         </CardContent>
                     </Card>
 

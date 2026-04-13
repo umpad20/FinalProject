@@ -61,6 +61,20 @@ class Product extends Model
         return $this->variants->sum('stock');
     }
 
+    public function getReservedStockAttribute(): int
+    {
+        return OrderItem::whereIn('product_variant_id', $this->variants->pluck('id'))
+            ->whereHas('order', function ($query) {
+                $query->whereIn('status', ['pending', 'processing']);
+            })
+            ->sum('quantity');
+    }
+
+    public function getAvailableStockAttribute(): int
+    {
+        return $this->total_stock - $this->reserved_stock;
+    }
+
     public function getIsNewAttribute(): bool
     {
         return $this->created_at >= now()->subDays(7);

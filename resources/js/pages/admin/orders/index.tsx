@@ -170,41 +170,9 @@ export default function AdminOrders({ orders }: Props) {
                                                     {formatPrice(order.total)}
                                                 </TableCell>
                                                 <TableCell className="text-center">
-                                                    <Select
-                                                        defaultValue={
-                                                            order.status
-                                                        }
-                                                        onValueChange={(v) =>
-                                                            handleStatusChange(
-                                                                order.id,
-                                                                v,
-                                                            )
-                                                        }
-                                                    >
-                                                        <SelectTrigger
-                                                            className="w-[130px]"
-                                                            aria-label="Update order status"
-                                                        >
-                                                            <SelectValue />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectItem value="pending">
-                                                                Pending
-                                                            </SelectItem>
-                                                            <SelectItem value="processing">
-                                                                Processing
-                                                            </SelectItem>
-                                                            <SelectItem value="shipped">
-                                                                Shipped
-                                                            </SelectItem>
-                                                            <SelectItem value="completed">
-                                                                Completed
-                                                            </SelectItem>
-                                                            <SelectItem value="cancelled">
-                                                                Cancelled
-                                                            </SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
+                                                    <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700 capitalize">
+                                                        {order.status}
+                                                    </span>
                                                 </TableCell>
                                                 <TableCell className="text-sm text-muted-foreground">
                                                     {new Date(

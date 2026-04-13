@@ -1,6 +1,7 @@
 import { Head } from '@inertiajs/react';
-import { DollarSign, Package, ShoppingCart, TrendingUp } from 'lucide-react';
+import { DollarSign, Package, ShoppingCart, TrendingUp, Download } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import {
@@ -93,15 +94,25 @@ export default function AdminReports({
 
     const maxUnitsSold = topProducts.length > 0 ? topProducts[0].unitsSold : 1;
 
+    const handleExportPdf = () => {
+        window.location.href = '/admin/reports/export-pdf';
+    };
+
     return (
         <AdminLayout title="Reports">
             <Head title="Admin - Reports" />
 
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold">Reports & Analytics</h1>
-                <p className="text-sm text-muted-foreground">
-                    Business performance overview
-                </p>
+            <div className="mb-6 flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-bold">Reports & Analytics</h1>
+                    <p className="text-sm text-muted-foreground">
+                        Business performance overview
+                    </p>
+                </div>
+                <Button onClick={handleExportPdf} className="gap-2">
+                    <Download className="h-4 w-4" />
+                    Export to PDF
+                </Button>
             </div>
 
             {/* Summary Stats */}

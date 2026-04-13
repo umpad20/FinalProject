@@ -80,7 +80,7 @@ export default function AdminLayout({
             {/* Sidebar */}
             <aside
                 className={cn(
-                    'fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-card transition-all duration-300 lg:relative lg:z-0',
+                    'fixed inset-y-0 left-0 z-50 flex flex-col border-r border-border bg-card transition-all duration-300',
                     sidebarCollapsed ? 'w-16' : 'w-64',
                     mobileSidebarOpen
                         ? 'translate-x-0'
@@ -144,7 +144,7 @@ export default function AdminLayout({
             </aside>
 
             {/* Main area */}
-            <div className="flex flex-1 flex-col min-w-0">
+            <div className={cn('flex flex-1 flex-col min-w-0', sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64')}>
                 {/* Top bar */}
                 <header className="flex h-16 items-center justify-between border-b border-border bg-card px-4 lg:px-6">
                     <div className="flex items-center gap-4">

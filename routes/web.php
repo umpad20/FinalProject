@@ -102,6 +102,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
 
     // Reports
     Route::get('/reports', [ReportController::class, 'index'])->name('reports');
+    Route::get('/reports/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.exportPdf');
 
     // Users
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');

@@ -238,18 +238,36 @@ export default function AdminDeliveries({ deliveries }: Props) {
                                                             <SelectValue />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            <SelectItem value="preparing">
-                                                                Preparing
-                                                            </SelectItem>
-                                                            <SelectItem value="in-transit">
-                                                                In Transit
-                                                            </SelectItem>
-                                                            <SelectItem value="delivered">
-                                                                Delivered
-                                                            </SelectItem>
-                                                            <SelectItem value="returned">
-                                                                Returned
-                                                            </SelectItem>
+                                                            {delivery.status === 'preparing' && (
+                                                                <>
+                                                                    <SelectItem value="in-transit">
+                                                                        In Transit
+                                                                    </SelectItem>
+                                                                    <SelectItem value="returned">
+                                                                        Returned
+                                                                    </SelectItem>
+                                                                </>
+                                                            )}
+                                                            {delivery.status === 'in-transit' && (
+                                                                <>
+                                                                    <SelectItem value="delivered">
+                                                                        Delivered
+                                                                    </SelectItem>
+                                                                    <SelectItem value="returned">
+                                                                        Returned
+                                                                    </SelectItem>
+                                                                </>
+                                                            )}
+                                                            {delivery.status === 'delivered' && (
+                                                                <SelectItem value="returned">
+                                                                    Returned
+                                                                </SelectItem>
+                                                            )}
+                                                            {delivery.status === 'returned' && (
+                                                                <SelectItem value="returned" disabled>
+                                                                    Final State
+                                                                </SelectItem>
+                                                            )}
                                                         </SelectContent>
                                                     </Select>
                                                 </TableCell>

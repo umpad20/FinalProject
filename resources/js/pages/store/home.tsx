@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import {
     ArrowRight,
     ShoppingBag,
@@ -26,9 +26,13 @@ type HomeProps = {
     featuredProducts: Product[];
     newArrivals: Product[];
     latestReviews: HomeReview[];
+    customerCount: number;
 };
 
-export default function Home({ categories, featuredProducts, newArrivals, latestReviews }: HomeProps) {
+export default function Home({ categories, featuredProducts, newArrivals, latestReviews, customerCount }: HomeProps) {
+    const { auth } = usePage().props as any;
+    const isLoggedIn = auth?.user;
+
     return (
         <StoreLayout>
             <Head title="Home" />
@@ -83,7 +87,7 @@ export default function Home({ categories, featuredProducts, newArrivals, latest
                                     </div>
                                     <div>
                                         <p className="text-sm font-semibold">
-                                            500+
+                                            {customerCount}+
                                         </p>
                                         <p className="text-xs text-muted-foreground">
                                             Happy Customers
@@ -221,32 +225,34 @@ export default function Home({ categories, featuredProducts, newArrivals, latest
                 </div>
             </section>
 
-            {/* Promo Banner */}
-            <section className="py-16" aria-label="Promotion">
-                <div className="mx-auto max-w-7xl px-4">
-                    <div className="relative overflow-hidden rounded-2xl bg-primary px-8 py-16 text-primary-foreground md:px-16">
-                        <div className="relative z-10 max-w-lg">
-                            <p className="mb-2 text-sm font-medium tracking-wider uppercase opacity-80">
-                                Limited Time Offer
-                            </p>
-                            <h2 className="mb-4 text-3xl font-bold md:text-4xl">
-                                Get 20% Off Your First Order
-                            </h2>
-                            <p className="mb-6 opacity-90">
-                                Sign up today and receive an exclusive discount
-                                on your first purchase. Don&apos;t miss out on
-                                premium fashion at unbeatable prices.
-                            </p>
-                            <Button variant="secondary" size="lg" asChild>
-                                <Link href="/register">Sign Up Now</Link>
-                            </Button>
+            {/* Promo Banner - Only show to non-logged-in users */}
+            {!isLoggedIn && (
+                <section className="py-16" aria-label="Promotion">
+                    <div className="mx-auto max-w-7xl px-4">
+                        <div className="relative overflow-hidden rounded-2xl bg-primary px-8 py-16 text-primary-foreground md:px-16">
+                            <div className="relative z-10 max-w-lg">
+                                <p className="mb-2 text-sm font-medium tracking-wider uppercase opacity-80">
+                                    Limited Time Offer
+                                </p>
+                                <h2 className="mb-4 text-3xl font-bold md:text-4xl">
+                                    Get 20% Off Your First Order
+                                </h2>
+                                <p className="mb-6 opacity-90">
+                                    Sign up today and receive an exclusive discount
+                                    on your first purchase. Don&apos;t miss out on
+                                    premium fashion at unbeatable prices.
+                                </p>
+                                <Button variant="secondary" size="lg" asChild>
+                                    <Link href="/register">Sign Up Now</Link>
+                                </Button>
+                            </div>
+                            {/* Decorative circles */}
+                            <div className="absolute -top-20 -right-20 h-80 w-80 rounded-full bg-white/10" />
+                            <div className="absolute -right-8 -bottom-16 h-48 w-48 rounded-full bg-white/5" />
                         </div>
-                        {/* Decorative circles */}
-                        <div className="absolute -top-20 -right-20 h-80 w-80 rounded-full bg-white/10" />
-                        <div className="absolute -right-8 -bottom-16 h-48 w-48 rounded-full bg-white/5" />
                     </div>
-                </div>
-            </section>
+                </section>
+            )}
 
             {/* Testimonials */}
             {latestReviews.length > 0 && (

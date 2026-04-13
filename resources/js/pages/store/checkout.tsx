@@ -32,9 +32,10 @@ type CheckoutCartItem = {
 
 type CheckoutProps = {
     cartItems: CheckoutCartItem[];
+    isFirstOrder: boolean;
 };
 
-export default function Checkout({ cartItems }: CheckoutProps) {
+export default function Checkout({ cartItems, isFirstOrder }: CheckoutProps) {
     const items = cartItems;
 
     const { data, setData, post, processing, errors } = useForm({
@@ -56,7 +57,8 @@ export default function Checkout({ cartItems }: CheckoutProps) {
         0,
     );
     const shipping = subtotal >= 2000 ? 0 : 100;
-    const total = subtotal + shipping;
+    const discountAmount = isFirstOrder ? Math.round(subtotal * 0.20 * 100) / 100 : 0;
+    const total = subtotal + shipping - discountAmount;
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -398,6 +400,16 @@ export default function Checkout({ cartItems }: CheckoutProps) {
                                             : formatPrice(shipping)}
                                     </span>
                                 </div>
+                                {discountAmount > 0 && (
+                                    <div className="flex justify-between text-sm">
+                                        <span className="text-green-600 font-medium">
+                                            First-time discount (20%)
+                                        </span>
+                                        <span className="text-green-600 font-medium">
+                                            -{formatPrice(discountAmount)}
+                                        </span>
+                                    </div>
+                                )}
                             </div>
 
                             <Separator className="my-4" />

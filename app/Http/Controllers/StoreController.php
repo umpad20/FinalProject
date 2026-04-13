@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Review;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -42,6 +43,9 @@ class StoreController extends Controller
                 'likesCount' => $r->likes_count,
             ]);
 
+        // Get actual customer count from database
+        $customerCount = User::where('is_admin', false)->count();
+
         return Inertia::render('store/home', [
             'categories' => $categories->map(fn ($c) => [
                 'id' => $c->id,
@@ -53,6 +57,7 @@ class StoreController extends Controller
             'featuredProducts' => $featuredProducts,
             'newArrivals' => $newArrivals,
             'latestReviews' => $latestReviews,
+            'customerCount' => $customerCount,
         ]);
     }
 
