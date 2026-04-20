@@ -11,7 +11,7 @@ class OrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::with(['user', 'items'])
+        $orders = Order::with(['user', 'items', 'cancellation'])
             ->latest()
             ->get()
             ->map(fn ($o) => [
@@ -31,6 +31,11 @@ class OrderController extends Controller
                 'total' => (float) $o->total,
                 'status' => $o->status,
                 'paymentMethod' => $o->payment_method,
+                'cancellation' => $o->cancellation ? [
+                    'id' => $o->cancellation->id,
+                    'reasonCategory' => $o->cancellation->reason_category,
+                    'cancelledAt' => $o->cancellation->cancelled_at->toISOString(),
+                ] : null,
                 'createdAt' => $o->created_at->toISOString(),
             ]);
 
@@ -41,7 +46,7 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        $order->load(['user', 'items', 'delivery']);
+        $order->load(['user', 'items', 'delivery', 'cancellation.user']);
 
         return Inertia::render('admin/orders/show', [
             'order' => [
@@ -63,12 +68,24 @@ class OrderController extends Controller
                 'total' => (float) $order->total,
                 'status' => $order->status,
                 'paymentMethod' => $order->payment_method,
-                'shippingAddress' => $order->shipping_address,
+                'shippingAddress' => is_array($order->shipping_address) ? $order->shipping_address : (is_string($order->shipping_address) ? $order->shipping_address : null),
                 'delivery' => $order->delivery ? [
                     'id' => $order->delivery->id,
                     'trackingNumber' => $order->delivery->tracking_number,
                     'status' => $order->delivery->status,
                     'estimatedDate' => $order->delivery->estimated_date?->format('Y-m-d'),
+                ] : null,
+                'cancellation' => $order->cancellation ? [
+                    'id' => $order->cancellation->id,
+                    'reasonCategory' => $order->cancellation->reason_category,
+                    'reason' => $order->cancellation->reason,
+                    'adminNotes' => $order->cancellation->admin_notes,
+                    'cancelledAt' => $order->cancellation->cancelled_at->toISOString(),
+                    'deductedAmount' => $order->cancellation->deducted_amount ? (float) $order->cancellation->deducted_amount : null,
+                    'user' => [
+                        'name' => $order->cancellation->user->name,
+                        'email' => $order->cancellation->user->email,
+                    ],
                 ] : null,
                 'createdAt' => $order->created_at->toISOString(),
                 'updatedAt' => $order->updated_at->toISOString(),

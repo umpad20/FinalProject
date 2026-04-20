@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\OrderCancellation;
 use App\Models\Review;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class CustomerController extends Controller
@@ -128,5 +130,58 @@ class CustomerController extends Controller
             'createdAt' => $order->created_at->toISOString(),
             'updatedAt' => $order->updated_at->toISOString(),
         ];
+    }
+
+    public function cancelOrder(Request $request, Order $order)
+    {
+        // Verify user owns this order
+        if ($order->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // Validate the order can be cancelled
+        if (!$order->canBeCancelled()) {
+            return back()->withErrors(['message' => 'This order cannot be cancelled. Only pending or processing orders can be cancelled.']);
+        }
+
+        // Validate request
+        $validated = $request->validate([
+            'reason_category' => 'required|in:changed-mind,found-cheaper,no-longer-needed,wrong-item,other',
+            'reason' => 'nullable|string|max:1000',
+        ]);
+
+        // Get old delivery status to determine if stock needs to be restored
+        $delivery = $order->delivery;
+        $oldDeliveryStatus = $delivery ? $delivery->status : null;
+
+        // Calculate deducted amount for pre-paid orders (gcash/card)
+        $deductedAmount = in_array($order->payment_method, ['gcash', 'card']) ? $order->total : null;
+
+        // Create cancellation record
+        OrderCancellation::create([
+            'order_id' => $order->id,
+            'user_id' => auth()->id(),
+            'reason_category' => $validated['reason_category'],
+            'reason' => $validated['reason'],
+            'cancelled_at' => now(),
+            'deducted_amount' => $deductedAmount,
+        ]);
+
+        // Update order status
+        $order->update(['status' => 'cancelled']);
+
+        // Update delivery status if it exists
+        if ($delivery) {
+            $delivery->update(['status' => 'returned']);
+
+            // Restore stock if order was already in-transit (stock was deducted)
+            if ($oldDeliveryStatus === 'in-transit') {
+                foreach ($order->items as $orderItem) {
+                    $orderItem->variant->increment('stock', $orderItem->quantity);
+                }
+            }
+        }
+
+        return back()->with('success', 'Order cancelled successfully.');
     }
 }

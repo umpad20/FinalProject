@@ -43,12 +43,33 @@ interface OrderDetail {
     total: number;
     status: string;
     paymentMethod: string;
-    shippingAddress: string;
+    shippingAddress: {
+        first_name?: string;
+        last_name?: string;
+        email?: string;
+        phone?: string;
+        address?: string;
+        city?: string;
+        province?: string;
+        zip?: string;
+    } | string | null;
     delivery: {
         id: number;
         trackingNumber: string | null;
         status: string;
         estimatedDate: string | null;
+    } | null;
+    cancellation: {
+        id: number;
+        reasonCategory: string;
+        reason: string | null;
+        adminNotes: string | null;
+        cancelledAt: string;
+        deductedAmount: number | null;
+        user: {
+            name: string;
+            email: string;
+        };
     } | null;
     createdAt: string;
     updatedAt: string;
@@ -59,249 +80,252 @@ interface Props {
 }
 
 export default function AdminOrderDetail({ order }: Props) {
-    const [status, setStatus] = useState(order.status);
-    const [updating, setUpdating] = useState(false);
+    try {
+        return (
+            <AdminLayout title={`Order ${order.orderNumber}`}>
+                <Head title={`Admin - Order ${order.orderNumber}`} />
 
-    const handleUpdateStatus = () => {
-        if (status === order.status) return;
-        setUpdating(true);
-        router.patch(
-            `/admin/orders/${order.id}/status`,
-            { status },
-            {
-                preserveScroll: true,
-                onFinish: () => setUpdating(false),
-            },
-        );
-    };
+                <div className="space-y-6">
+                {/* Header */}
+                <div className="flex items-start justify-between">
+                    <div>
+                        <h1 className="text-4xl font-bold tracking-tight">{order.orderNumber}</h1>
+                        <p className="text-sm text-muted-foreground mt-2">
+                            {order.customerName} • {order.customerEmail}
+                        </p>
+                    </div>
+                    <div className="flex gap-2">
+                        <Link
+                            href="/admin/orders"
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-md border border-input hover:bg-accent transition-colors"
+                        >
+                            <ArrowLeft className="h-4 w-4" /> Back
+                        </Link>
+                        <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => window.print()}
+                            className="gap-2"
+                        >
+                            <Printer className="h-4 w-4" /> Print
+                        </Button>
+                    </div>
+                </div>
 
-    return (
-        <AdminLayout title={`Order ${order.orderNumber}`}>
-            <Head title={`Admin - Order ${order.orderNumber}`} />
+                {/* Main Grid */}
+                <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
+                    {/* LEFT COLUMN: Items & Pricing */}
+                    <div className="lg:col-span-2 space-y-6">
+                        {/* Order Items Card */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Order Items ({order.items.length})</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                {order.items.map((item, idx) => (
+                                    <div key={item.id}>
+                                        <div className="flex gap-4">
+                                            {item.productImage && (
+                                                <img
+                                                    src={item.productImage}
+                                                    alt={item.productName}
+                                                    className="h-20 w-20 object-cover rounded-lg border border-border"
+                                                />
+                                            )}
+                                            <div className="flex-1">
+                                                <p className="font-semibold text-base">{item.productName}</p>
+                                                <p className="text-sm text-muted-foreground mt-1">
+                                                    {item.size} • {item.color}
+                                                </p>
+                                                <p className="text-sm text-muted-foreground mt-2">
+                                                    Qty: <span className="font-medium">{item.quantity}</span>
+                                                </p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-sm text-muted-foreground">{formatPrice(item.price)} each</p>
+                                                <p className="text-lg font-bold mt-2">{formatPrice(item.price * item.quantity)}</p>
+                                            </div>
+                                        </div>
+                                        {idx < order.items.length - 1 && <Separator className="mt-4" />}
+                                    </div>
+                                ))}
+                            </CardContent>
+                        </Card>
 
-            <div className="mb-6 flex items-center justify-between">
-                <Link
-                    href="/admin/orders"
-                    className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
-                >
-                    <ArrowLeft className="h-4 w-4" /> Back to orders
-                </Link>
-                <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => window.print()}
-                >
-                    <Printer className="mr-2 h-4 w-4" /> Print Invoice
-                </Button>
-            </div>
-
-            <div className="grid gap-6 lg:grid-cols-3">
-                <div className="space-y-6 lg:col-span-2">
-                    {/* Order Items */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Order Items</CardTitle>
-                        </CardHeader>
-                        <CardContent className="p-0">
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Product</TableHead>
-                                        <TableHead className="text-center">
-                                            Qty
-                                        </TableHead>
-                                        <TableHead className="text-right">
-                                            Price
-                                        </TableHead>
-                                        <TableHead className="text-right">
-                                            Total
-                                        </TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {order.items.map((item) => (
-                                        <TableRow key={item.id}>
-                                            <TableCell>
-                                                <div className="flex items-center gap-3">
-                                                    {item.productImage && (
-                                                        <img
-                                                            src={
-                                                                item.productImage
-                                                            }
-                                                            alt={
-                                                                item.productName
-                                                            }
-                                                            className="h-10 w-10 rounded-md object-cover"
-                                                        />
-                                                    )}
-                                                    <div>
-                                                        <p className="text-sm font-medium">
-                                                            {item.productName}
-                                                        </p>
-                                                        <p className="text-xs text-muted-foreground">
-                                                            {item.size} /{' '}
-                                                            {item.color}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </TableCell>
-                                            <TableCell className="text-center">
-                                                {item.quantity}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                {formatPrice(item.price)}
-                                            </TableCell>
-                                            <TableCell className="text-right font-medium">
-                                                {formatPrice(
-                                                    item.price * item.quantity,
-                                                )}
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                            <div className="border-t px-6 py-4">
+                        {/* Price Breakdown Card */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-base">Price Breakdown</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">
-                                        Subtotal
-                                    </span>
+                                    <span className="text-muted-foreground">Subtotal</span>
                                     <span>{formatPrice(order.subtotal)}</span>
                                 </div>
                                 <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">
-                                        Shipping
-                                    </span>
-                                    <span>
-                                        {order.shipping > 0
-                                            ? formatPrice(order.shipping)
-                                            : 'Free'}
-                                    </span>
+                                    <span className="text-muted-foreground">Shipping</span>
+                                    <span>{order.shipping > 0 ? formatPrice(order.shipping) : 'Free'}</span>
                                 </div>
-                                <Separator className="my-2" />
-                                <div className="flex justify-between font-bold">
-                                    <span>Total</span>
-                                    <span>{formatPrice(order.total)}</span>
+                                <Separator />
+                                <div className="flex justify-between">
+                                    <span className="font-semibold">Total</span>
+                                    <span className="text-xl font-bold">{formatPrice(order.total)}</span>
                                 </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
 
-                <div className="space-y-6">
-                    {/* Status */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Order Status</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <span className="inline-flex items-center rounded-full bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700 capitalize">
-                                {order.status}
-                            </span>
-                            <p className="text-xs text-muted-foreground mt-3">
-                                Update status through the Deliveries page
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    {/* Customer */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Customer</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                            <p className="text-sm font-medium">
-                                {order.customerName}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                                {order.customerEmail}
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    {/* Shipping */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Shipping Address</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="text-sm">{order.customerName}</p>
-                            <p className="text-sm text-muted-foreground">
-                                {order.shippingAddress || 'No address provided'}
-                            </p>
-                        </CardContent>
-                    </Card>
-
-                    {/* Delivery */}
-                    {order.delivery && (
+                    {/* RIGHT COLUMN: Details Cards */}
+                    <div className="space-y-6">
+                        {/* Status Card */}
                         <Card>
                             <CardHeader>
-                                <CardTitle>Delivery</CardTitle>
+                                <CardTitle className="text-base">Status</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <div style={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    padding: '4px 12px',
+                                    borderRadius: '9999px',
+                                    fontSize: '12px',
+                                    fontWeight: '600',
+                                    textTransform: 'uppercase',
+                                    backgroundColor: order.status === 'cancelled' ? '#fee2e2' : order.status === 'completed' ? '#dcfce7' : '#dbeafe',
+                                    color: order.status === 'cancelled' ? '#991b1b' : order.status === 'completed' ? '#166534' : '#0c2d6b'
+                                }}>
+                                    {order.status}
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Customer Card */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-base">Customer</CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-2">
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-muted-foreground">
-                                        Status
-                                    </span>
-                                    <span className="capitalize">
-                                        {order.delivery.status}
-                                    </span>
+                                <div>
+                                    <p className="text-xs text-muted-foreground">Name</p>
+                                    <p className="font-medium">{order.customerName}</p>
                                 </div>
-                                {order.delivery.trackingNumber && (
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">
-                                            Tracking
-                                        </span>
-                                        <span className="font-mono text-xs">
-                                            {order.delivery.trackingNumber}
-                                        </span>
+                                <div>
+                                    <p className="text-xs text-muted-foreground">Email</p>
+                                    <p className="text-sm break-all">{order.customerEmail}</p>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Shipping Address Card */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-base">Shipping Address</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                {order.shippingAddress && typeof order.shippingAddress === 'object' && 'first_name' in order.shippingAddress ? (
+                                    <div className="space-y-1 text-sm">
+                                        {(order.shippingAddress as any).first_name && <p><strong>{(order.shippingAddress as any).first_name} {(order.shippingAddress as any).last_name}</strong></p>}
+                                        {(order.shippingAddress as any).address && <p>{(order.shippingAddress as any).address}</p>}
+                                        {(order.shippingAddress as any).city && <p>{(order.shippingAddress as any).city}, {(order.shippingAddress as any).province} {(order.shippingAddress as any).zip}</p>}
+                                        {(order.shippingAddress as any).phone && <p>Phone: {(order.shippingAddress as any).phone}</p>}
+                                        {(order.shippingAddress as any).email && <p>Email: {(order.shippingAddress as any).email}</p>}
                                     </div>
-                                )}
-                                {order.delivery.estimatedDate && (
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">
-                                            Est. Delivery
-                                        </span>
-                                        <span>
-                                            {new Date(
-                                                order.delivery.estimatedDate,
-                                            ).toLocaleDateString()}
-                                        </span>
-                                    </div>
+                                ) : (
+                                    <p className="text-sm">{typeof order.shippingAddress === 'string' ? order.shippingAddress : 'No address provided'}</p>
                                 )}
                             </CardContent>
                         </Card>
-                    )}
 
-                    {/* Dates */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Timeline</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">
-                                    Ordered
-                                </span>
-                                <span>
-                                    {new Date(
-                                        order.createdAt,
-                                    ).toLocaleDateString()}
-                                </span>
-                            </div>
-                            <div className="flex justify-between text-sm">
-                                <span className="text-muted-foreground">
-                                    Last Updated
-                                </span>
-                                <span>
-                                    {new Date(
-                                        order.updatedAt,
-                                    ).toLocaleDateString()}
-                                </span>
-                            </div>
-                        </CardContent>
-                    </Card>
+                        {/* Delivery Card */}
+                        {order.delivery && (
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="text-base">Delivery</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-3">
+                                    <div>
+                                        <p className="text-xs text-muted-foreground">Status</p>
+                                        <p className="font-medium capitalize">{order.delivery.status}</p>
+                                    </div>
+                                    {order.delivery.trackingNumber && (
+                                        <div>
+                                            <p className="text-xs text-muted-foreground">Tracking Number</p>
+                                            <p className="font-mono text-sm">{order.delivery.trackingNumber}</p>
+                                        </div>
+                                    )}
+                                    {order.delivery.estimatedDate && (
+                                        <div>
+                                            <p className="text-xs text-muted-foreground">Est. Delivery</p>
+                                            <p className="font-medium">{new Date(order.delivery.estimatedDate).toLocaleDateString()}</p>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        )}
+
+                        {/* Cancellation Card */}
+                        {order.cancellation && (
+                            <Card className="border-red-200 dark:border-red-900">
+                                <CardHeader>
+                                    <CardTitle className="text-base text-red-600 dark:text-red-400">Cancellation</CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-3">
+                                    <div>
+                                        <p className="text-xs text-muted-foreground">Cancelled By</p>
+                                        <p className="font-medium">{order.cancellation.user.name}</p>
+                                        <p className="text-xs text-muted-foreground">{order.cancellation.user.email}</p>
+                                    </div>
+                                    <Separator />
+                                    <div>
+                                        <p className="text-xs text-muted-foreground">Reason</p>
+                                        <p className="font-medium capitalize">{order.cancellation.reasonCategory.replace(/-/g, ' ')}</p>
+                                    </div>
+                                    {order.cancellation.reason && (
+                                        <div>
+                                            <p className="text-xs text-muted-foreground">Details</p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">{order.cancellation.reason}</p>
+                                        </div>
+                                    )}
+                                    {order.cancellation.deductedAmount && (
+                                        <div className="pt-2 border-t">
+                                            <p className="text-xs text-muted-foreground">Amount Deducted</p>
+                                            <p className="text-lg font-bold text-red-600 dark:text-red-400">-₱{order.cancellation.deductedAmount.toFixed(2)}</p>
+                                        </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        )}
+
+                        {/* Dates Card */}
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-base">Timeline</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                <div>
+                                    <p className="text-xs text-muted-foreground">Ordered</p>
+                                    <p className="font-medium">{new Date(order.createdAt).toLocaleString()}</p>
+                                </div>
+                                <div>
+                                    <p className="text-xs text-muted-foreground">Last Updated</p>
+                                    <p className="font-medium">{new Date(order.updatedAt).toLocaleString()}</p>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
                 </div>
-            </div>
-        </AdminLayout>
-    );
+                </div>
+            </AdminLayout>
+        );
+    } catch (error) {
+        return (
+            <AdminLayout title="Error">
+                <div style={{ color: 'red', padding: '20px' }}>
+                    <h1>Error Loading Order</h1>
+                    <p>{String(error)}</p>
+                </div>
+            </AdminLayout>
+        );
+    }
 }
+

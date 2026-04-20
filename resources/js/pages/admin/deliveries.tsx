@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { Search, Truck } from 'lucide-react';
+import { Search, Truck, X } from 'lucide-react';
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -29,6 +29,9 @@ interface DeliveryRow {
     status: string;
     estimatedDate: string | null;
     trackingNumber: string;
+    isCancelled: boolean;
+    cancellationReason: string | null;
+    cancelledAt: string | null;
 }
 
 interface Props {
@@ -48,6 +51,7 @@ const statusColors: Record<string, string> = {
 export default function AdminDeliveries({ deliveries }: Props) {
     const [activeTab, setActiveTab] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
+    const [openCancellationPopover, setOpenCancellationPopover] = useState<number | null>(null);
 
     const filteredDeliveries = deliveries.filter((d) => {
         if (activeTab !== 'all' && d.status !== activeTab) return false;
@@ -169,6 +173,9 @@ export default function AdminDeliveries({ deliveries }: Props) {
                                             Status
                                         </TableHead>
                                         <TableHead className="text-center">
+                                            Cancellation
+                                        </TableHead>
+                                        <TableHead className="text-center">
                                             Update
                                         </TableHead>
                                     </TableRow>
@@ -218,6 +225,73 @@ export default function AdminDeliveries({ deliveries }: Props) {
                                                                   1,
                                                               )}
                                                     </span>
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    {delivery.isCancelled ? (
+                                                        <div className="relative">
+                                                            <button
+                                                                onClick={() =>
+                                                                    setOpenCancellationPopover(
+                                                                        openCancellationPopover ===
+                                                                            delivery.id
+                                                                            ? null
+                                                                            : delivery.id,
+                                                                    )
+                                                                }
+                                                                className="inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-800 hover:bg-red-200 dark:bg-red-900 dark:text-red-200 dark:hover:bg-red-800 transition cursor-pointer"
+                                                            >
+                                                                Cancelled
+                                                            </button>
+                                                            {openCancellationPopover ===
+                                                                delivery.id && (
+                                                                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50 w-80 bg-white dark:bg-slate-950 border border-gray-200 dark:border-slate-800 rounded-lg shadow-lg p-4 space-y-3">
+                                                                    <div className="flex items-center justify-between">
+                                                                        <h3 className="font-semibold text-sm">
+                                                                            Cancellation Details
+                                                                        </h3>
+                                                                        <button
+                                                                            onClick={() =>
+                                                                                setOpenCancellationPopover(
+                                                                                    null,
+                                                                                )
+                                                                            }
+                                                                            className="text-muted-foreground hover:text-foreground"
+                                                                        >
+                                                                            <X className="h-4 w-4" />
+                                                                        </button>
+                                                                    </div>
+                                                                    <div className="space-y-2 text-sm">
+                                                                        <div>
+                                                                            <p className="text-xs text-muted-foreground">
+                                                                                Reason
+                                                                            </p>
+                                                                            <p className="font-medium capitalize">
+                                                                                {delivery.cancellationReason?.replace(
+                                                                                    /-/g,
+                                                                                    ' ',
+                                                                                )}
+                                                                            </p>
+                                                                        </div>
+                                                                        <div>
+                                                                            <p className="text-xs text-muted-foreground">
+                                                                                Cancelled On
+                                                                            </p>
+                                                                            <p className="text-sm">
+                                                                                {new Date(
+                                                                                    delivery.cancelledAt ||
+                                                                                        '',
+                                                                                ).toLocaleString()}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-xs text-muted-foreground">
+                                                            —
+                                                        </span>
+                                                    )}
                                                 </TableCell>
                                                 <TableCell className="text-center">
                                                     <Select

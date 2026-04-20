@@ -1,7 +1,10 @@
+import { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, CheckCircle2, Clock, Package, Star, Truck } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Clock, Package, Star, Truck, X } from 'lucide-react';
 import ReviewForm from '@/components/review-form';
+import CancelOrderModal from '@/components/cancel-order-modal';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import StoreLayout from '@/layouts/store-layout';
@@ -52,7 +55,9 @@ const statusSteps = [
 const statusOrder = ['pending', 'processing', 'shipped', 'completed'];
 
 export default function OrderDetail({ order }: OrderDetailProps) {
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
     const currentStepIndex = statusOrder.indexOf(order.status);
+    const canCancel = order.status === 'pending' || order.status === 'processing';
 
     return (
         <StoreLayout>
@@ -66,7 +71,7 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                     <ArrowLeft className="h-4 w-4" /> Back to orders
                 </Link>
 
-                <div className="mb-8 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h1 className="text-2xl font-bold">
                             {order.orderNumber}
@@ -75,20 +80,35 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                             Placed on {new Date(order.createdAt).toLocaleDateString()}
                         </p>
                     </div>
-                    <span
-                        className={`inline-flex w-fit items-center rounded-full px-3 py-1 text-sm font-medium ${
-                            order.status === 'completed'
-                                ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                                : order.status === 'processing'
-                                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                                  : order.status === 'shipped'
-                                    ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
-                                    : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
-                        }`}
-                    >
-                        {order.status.charAt(0).toUpperCase() +
-                            order.status.slice(1)}
-                    </span>
+                    <div className="flex items-center gap-3">
+                        <span
+                            className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
+                                order.status === 'completed'
+                                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                                    : order.status === 'processing'
+                                      ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                                      : order.status === 'shipped'
+                                        ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
+                                        : order.status === 'cancelled'
+                                          ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                                          : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                            }`}
+                        >
+                            {order.status.charAt(0).toUpperCase() +
+                                order.status.slice(1)}
+                        </span>
+                        {canCancel && (
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => setIsCancelModalOpen(true)}
+                                className="gap-2"
+                            >
+                                <X className="h-4 w-4" />
+                                Cancel Order
+                            </Button>
+                        )}
+                    </div>
                 </div>
 
                 {/* Progress tracker */}
@@ -274,6 +294,12 @@ export default function OrderDetail({ order }: OrderDetailProps) {
                     </Card>
                 </div>
             </div>
+
+            <CancelOrderModal
+                orderId={order.id}
+                isOpen={isCancelModalOpen}
+                onClose={() => setIsCancelModalOpen(false)}
+            />
         </StoreLayout>
     );
 }

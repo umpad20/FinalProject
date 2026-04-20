@@ -56,6 +56,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dashboard', [CustomerController::class, 'dashboard'])->name('dashboard');
         Route::get('/orders', [CustomerController::class, 'orders'])->name('orders');
         Route::get('/orders/{order}', [CustomerController::class, 'orderDetail'])->name('orders.show');
+        Route::post('/orders/{order}/cancel', [CustomerController::class, 'cancelOrder'])->name('orders.cancel');
     });
 
     // Reviews

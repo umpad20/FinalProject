@@ -39,60 +39,60 @@ export default function Home({ categories, featuredProducts, newArrivals, latest
 
             {/* Hero Section */}
             <section
-                className="relative overflow-hidden bg-gradient-to-br from-background via-background to-muted"
+                className="relative w-full overflow-hidden bg-cover bg-center bg-no-repeat py-16 sm:py-20 md:py-32 lg:min-h-screen lg:py-0"
+                style={{
+                    backgroundImage: 'url(https://plus.unsplash.com/premium_photo-1661281366900-88b41445a004?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center right',
+                    backgroundAttachment: 'scroll',
+                }}
                 aria-label="Hero"
             >
-                <div className="mx-auto max-w-7xl px-4 py-20 md:py-32">
-                    <div className="grid items-center gap-12 md:grid-cols-2">
-                        <div className="space-y-6">
-                            <div className="inline-block rounded-full border border-border px-4 py-1 text-sm text-muted-foreground">
-                                New Collection 2026
-                            </div>
-                            <h1 className="text-4xl font-bold tracking-tight md:text-6xl">
-                                Elevate Your
-                                <span className="block">Style Game</span>
-                            </h1>
-                            <p className="max-w-md text-lg text-muted-foreground">
-                                Discover curated fashion pieces that blend
-                                comfort with style. Premium quality clothing for
-                                the modern individual.
-                            </p>
-                            <div className="flex flex-wrap gap-4">
-                                <Button size="lg" asChild>
-                                    <Link href="/shop">
-                                        Shop Now{' '}
-                                        <ArrowRight className="ml-2 h-4 w-4" />
-                                    </Link>
-                                </Button>
-                                <Button size="lg" variant="outline" asChild>
-                                    <Link href="/shop?category=T-Shirts">
-                                        Browse Collection
-                                    </Link>
-                                </Button>
-                            </div>
+                {/* Dark Overlay */}
+                <div className="absolute inset-0 bg-black/50"></div>
+
+                {/* Content */}
+                <div className="relative z-10 mx-auto flex w-full max-w-7xl items-center px-4 py-16 sm:px-6 sm:py-20 md:px-8 lg:min-h-screen lg:py-0">
+                    <div className="w-full max-w-2xl space-y-4 sm:space-y-6 md:space-y-8">
+                        <div className="inline-flex items-center rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs sm:text-sm text-white backdrop-blur-sm">
+                            New Collection 2026
                         </div>
-                        <div className="relative">
-                            <div className="aspect-[4/5] overflow-hidden rounded-2xl bg-muted">
-                                <img
-                                    src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=1000&fit=crop"
-                                    alt="Fashion collection showcase"
-                                    className="h-full w-full object-cover"
-                                />
-                            </div>
-                            {/* Floating card */}
-                            <div className="absolute -bottom-4 -left-4 rounded-lg border border-border bg-card p-4 shadow-lg md:-left-8">
-                                <div className="flex items-center gap-3">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                                        <ShoppingBag className="h-5 w-5" />
-                                    </div>
-                                    <div>
-                                        <p className="text-sm font-semibold">
-                                            {customerCount}+
-                                        </p>
-                                        <p className="text-xs text-muted-foreground">
-                                            Happy Customers
-                                        </p>
-                                    </div>
+                        <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl leading-tight">
+                            Elevate Your
+                            <span className="block">Style Game</span>
+                        </h1>
+                        <p className="max-w-2xl text-base text-white/90 sm:text-lg md:text-xl">
+                            Discover curated fashion pieces that blend comfort
+                            with style. Premium quality clothing for the modern
+                            individual.
+                        </p>
+                        <div className="flex flex-col gap-3 pt-2 sm:pt-4 sm:flex-row sm:gap-4">
+                            <Button size="sm" className="bg-white text-black font-semibold hover:bg-gray-100 w-full sm:w-auto sm:size-lg" asChild>
+                                <Link href="/shop">
+                                    Shop Now{' '}
+                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                </Link>
+                            </Button>
+                            <Button size="sm" className="bg-white/20 text-white border-2 border-white font-semibold hover:bg-white/30 w-full sm:w-auto sm:size-lg" asChild>
+                                <Link href="/shop?category=T-Shirts">
+                                    Browse Collection
+                                </Link>
+                            </Button>
+                        </div>
+
+                        {/* Customer Count Card */}
+                        <div className="pt-4 sm:pt-8">
+                            <div className="inline-flex items-center gap-2 rounded-lg bg-white/10 backdrop-blur-md border border-white/20 p-3 sm:gap-3 sm:p-4">
+                                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-black sm:h-12 sm:w-12">
+                                    <ShoppingBag className="h-5 w-5 sm:h-6 sm:w-6" />
+                                </div>
+                                <div>
+                                    <p className="text-base font-semibold text-white sm:text-lg">
+                                        {customerCount}+
+                                    </p>
+                                    <p className="text-xs text-white/80 sm:text-sm">
+                                        Happy Customers
+                                    </p>
                                 </div>
                             </div>
                         </div>

@@ -35,4 +35,15 @@ class Order extends Model
     {
         return $this->hasOne(Delivery::class);
     }
+
+    public function cancellation(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(OrderCancellation::class);
+    }
+
+    public function canBeCancelled(): bool
+    {
+        // Order can only be cancelled if it's pending or processing
+        return in_array($this->status, ['pending', 'processing']);
+    }
 }

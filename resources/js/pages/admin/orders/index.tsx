@@ -42,6 +42,11 @@ interface OrderRow {
     total: number;
     status: string;
     paymentMethod: string;
+    cancellation: {
+        id: number;
+        reasonCategory: string;
+        cancelledAt: string;
+    } | null;
     createdAt: string;
 }
 
@@ -107,6 +112,7 @@ export default function AdminOrders({ orders }: Props) {
                     <TabsTrigger value="processing">Processing</TabsTrigger>
                     <TabsTrigger value="shipped">Shipped</TabsTrigger>
                     <TabsTrigger value="completed">Completed</TabsTrigger>
+                    <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value={activeTab} className="mt-4">
@@ -123,6 +129,9 @@ export default function AdminOrders({ orders }: Props) {
                                         </TableHead>
                                         <TableHead className="text-center">
                                             Status
+                                        </TableHead>
+                                        <TableHead className="text-center">
+                                            Cancellation
                                         </TableHead>
                                         <TableHead>Date</TableHead>
                                         <TableHead className="text-center">
@@ -173,6 +182,20 @@ export default function AdminOrders({ orders }: Props) {
                                                     <span className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700 capitalize">
                                                         {order.status}
                                                     </span>
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    {order.cancellation ? (
+                                                        <span
+                                                            title={`Cancelled: ${order.cancellation.reasonCategory}`}
+                                                            className="inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-700 capitalize"
+                                                        >
+                                                            Cancelled
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-xs text-muted-foreground">
+                                                            —
+                                                        </span>
+                                                    )}
                                                 </TableCell>
                                                 <TableCell className="text-sm text-muted-foreground">
                                                     {new Date(

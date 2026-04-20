@@ -11,7 +11,7 @@ class DeliveryController extends Controller
 {
     public function index()
     {
-        $deliveries = Delivery::with(['order.user'])
+        $deliveries = Delivery::with(['order.user', 'order.cancellation'])
             ->latest()
             ->get()
             ->map(fn ($d) => [
@@ -22,6 +22,9 @@ class DeliveryController extends Controller
                 'status' => $d->status,
                 'estimatedDate' => $d->estimated_date?->format('Y-m-d'),
                 'trackingNumber' => $d->tracking_number ?? 'N/A',
+                'isCancelled' => $d->order->cancellation ? true : false,
+                'cancellationReason' => $d->order->cancellation?->reason_category,
+                'cancelledAt' => $d->order->cancellation?->cancelled_at?->toISOString(),
             ]);
 
         return Inertia::render('admin/deliveries', [
