@@ -86,7 +86,7 @@ class ProductSeeder extends Seeder
                 'featured' => 1,
                 'status' => 'active',
                 'images' => [
-                    ['url' => 'https://images.unsplash.com/photo-1595777457583-95e058d6b451?w=500&h=500&fit=crop', 'alt' => 'Floral Summer Dress', 'sort_order' => 0],
+                    ['url' => 'https://images.unsplash.com/photo-1595777438175-e51d34d4b00b?w=500&h=500&fit=crop', 'alt' => 'Floral Summer Dress', 'sort_order' => 0],
                 ],
                 'variants' => [
                     ['size' => 'XS', 'color' => 'Beige', 'color_hex' => '#d4a574', 'stock' => 6, 'sku' => 'FSD-XS-BG'],
@@ -125,7 +125,7 @@ class ProductSeeder extends Seeder
                 'featured' => 0,
                 'status' => 'active',
                 'images' => [
-                    ['url' => 'https://images.unsplash.com/photo-1503342217505-b0a15364e622?w=500&h=500&fit=crop', 'alt' => 'Graphic Print Tee', 'sort_order' => 0],
+                    ['url' => 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&h=500&fit=crop', 'alt' => 'Graphic Print Tee', 'sort_order' => 0],
                 ],
                 'variants' => [
                     ['size' => 'S', 'color' => 'White', 'color_hex' => '#FFFFFF', 'stock' => 15, 'sku' => 'GPT-S-W'],
