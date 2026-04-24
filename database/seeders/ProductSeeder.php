@@ -11,6 +11,9 @@ class ProductSeeder extends Seeder
 {
     public function run(): void
     {
+        // Truncate old products (cascades to images and variants)
+        Product::truncate();
+
         $products = [
             [
                 'name' => 'Classic White Teee',
